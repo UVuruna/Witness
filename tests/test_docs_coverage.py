@@ -17,10 +17,22 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from _guards_common import PROJECT_ROOT, iter_source_files  # noqa: E402
 
-# All three tiers empty since founding (2026-09-01): no product code exists
-# yet. The first Kotlin/Compose file lands with its tier entry here in the
-# same commit.
-TRIVIAL: set[str] = set()
+# M0 CALL-AUDIO PROBE (2026-09-01): a throwaway feasibility harness, not the
+# product. It answers ONE question — what does the microphone actually capture
+# during a phone call — then gets replaced by real subsystems at M1. Because it
+# is a single coherent throwaway module, its files are Trivial (documented as a
+# whole in app/___app.md), NOT Standard subsystems owed one __about doc each.
+# When M1 product code lands, files graduate to their real tier with __about
+# docs in the same commit.
+TRIVIAL: set[str] = {
+    "app/src/main/java/com/uvuruna/callprobe/MainActivity.kt",
+    "app/src/main/java/com/uvuruna/callprobe/audio/WavRecorder.kt",
+    "app/src/main/java/com/uvuruna/callprobe/audio/RecordingStore.kt",
+    "app/src/main/java/com/uvuruna/callprobe/service/RecorderService.kt",
+    "app/src/main/java/com/uvuruna/callprobe/call/CallMonitor.kt",
+    "app/src/main/java/com/uvuruna/callprobe/ui/ProbeViewModel.kt",
+    "app/src/main/java/com/uvuruna/callprobe/ui/ProbeScreen.kt",
+}
 STANDARD: set[str] = set()
 ALGORITHMIC: set[str] = set()
 

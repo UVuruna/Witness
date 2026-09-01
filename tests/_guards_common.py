@@ -20,11 +20,21 @@ EXCLUDE_DIR_NAMES = {
 # THE STRUCTURE LAW, never Python only.
 SOURCE_EXTENSIONS = {".py", ".kt", ".kts", ".js", ".ts", ".html", ".css"}
 
+# Gradle build scripts are declarative BUILD config, not product source: they
+# are governed by the build itself, carry no tier and own no __about doc. They
+# would otherwise be swept in as .kts source. (The CONFIG SECTION law owns
+# config surfaces separately.)
+EXCLUDE_FILE_NAMES = {
+    "build.gradle.kts", "settings.gradle.kts", "gradle.properties",
+}
+
 
 def _walk_files(suffixes: set[str]):
     for dirpath, dirnames, filenames in os.walk(PROJECT_ROOT):
         dirnames[:] = [d for d in dirnames if d not in EXCLUDE_DIR_NAMES]
         for name in filenames:
+            if name in EXCLUDE_FILE_NAMES:
+                continue
             if Path(name).suffix in suffixes:
                 yield Path(dirpath) / name
 

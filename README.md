@@ -49,9 +49,13 @@ step; no product code exists yet. Distribution target: Google Play
   📝 README.md          ← you are here
   📝 CLAUDE.md          ← project rules: stack, laws, how to run/test
   📁 docs/              ← PLAN, FEATURES, ARCHITECTURE
+  📁 app/               ← M0 call-audio probe (throwaway) — see app/___app.md
   📁 assets/            ← logo
   📁 tests/             ← guard tests (structure, config, docs, links)
   📁 UV/                ← owner's inbox (untracked)
 ```
+
+The M0 feasibility probe — a throwaway app that measures what the microphone
+actually captures during a call — is documented in [app/___app.md](app/___app.md).
 
 Guard tests are documented in [tests](tests/___tests.md).
