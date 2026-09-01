@@ -1,0 +1,25 @@
+# Owner's inbox and agent tooling — never tracked (root CLAUDE.md)
+UV/
+.claude/
+prompt.txt
+
+# Python guard-test caches
+__pycache__/
+.pytest_cache/
+
+# Android / Gradle build output
+.gradle/
+.kotlin/
+build/
+app/build/
+local.properties
+.idea/
+captures/
+
+# Signing material — never in git
+*.keystore
+*.jks
+keystore.properties
+
+# Runtime logs
+logs/

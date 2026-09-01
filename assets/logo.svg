@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+  <defs>
+    <linearGradient id="shield" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2b6cb0"/>
+      <stop offset="1" stop-color="#1a365d"/>
+    </linearGradient>
+    <linearGradient id="rim" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#63b3ed"/>
+      <stop offset="1" stop-color="#2c5282"/>
+    </linearGradient>
+  </defs>
+  <!-- shield -->
+  <path d="M64 6 L114 24 V62 C114 92 94 112 64 122 C34 112 14 92 14 62 V24 Z"
+        fill="url(#shield)" stroke="url(#rim)" stroke-width="5"
+        stroke-linejoin="round"/>
+  <!-- voice waveform: the call this shield protects -->
+  <g stroke="#ffffff" stroke-width="7" stroke-linecap="round">
+    <line x1="34" y1="56" x2="34" y2="72"/>
+    <line x1="49" y1="46" x2="49" y2="82"/>
+    <line x1="64" y1="36" x2="64" y2="92"/>
+    <line x1="79" y1="46" x2="79" y2="82"/>
+    <line x1="94" y1="56" x2="94" y2="72"/>
+  </g>
+</svg>
