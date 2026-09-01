@@ -35,7 +35,9 @@ module map and technology decisions in [ARCHITECTURE](docs/ARCHITECTURE.md).
 
 ## Status
 
-Founded 2026-09-01. Milestone M0 — a throwaway feasibility probe of
+Founded 2026-09-01. The owner has picked the final name — **Witness** — and
+the pending folder rename is fully specified in [RENAME](RENAME.md) (this
+session could not run it while live inside the folder). Milestone M0 — a throwaway feasibility probe of
 microphone capture during a speakerphone call on real devices — is the next
 step; no product code exists yet. Distribution target: Google Play
 (official-APIs-only is a project law, see [CLAUDE.md](CLAUDE.md)).

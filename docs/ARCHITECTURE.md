@@ -17,7 +17,7 @@ Navigation: [README](../README.md) · [PLAN](PLAN.md) · [FEATURES](FEATURES.md)
 | **Transcriber** | After the call (never live): audio → text with per-segment timestamps, then diarization → speaker labels. Runs on-device. | whisper.cpp via JNI; lightweight diarization |
 | **Vault** | Encrypted storage of recordings + transcripts, hash + timestamp seal at creation, Room index, optional off-phone copy. | Jetpack Security, Room |
 | **Lists** | Record/skip decisions per number; record-everything default. | `READ_CALL_LOG` (declared) |
-| **Guard** | PIN/biometric gate, neutral name/icon (activity-alias), nothing leaked to gallery/recents/share sheets. | BiometricPrompt, activity-alias |
+| **Guard** | PIN/biometric gate; the user picks an alternative neutral name + icon from an offered set with one tap (owner decree 2026-09-01); nothing leaked to gallery/recents/share sheets. | BiometricPrompt, activity-alias per look |
 | **SOS** (M4) | Always-listening danger-phrase recognition during calls; on match, automatic location alert to trusted contacts with a short cancel window. | Picovoice Porcupine (on-device), fused location |
 
 ## Data flow

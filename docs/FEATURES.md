@@ -53,9 +53,12 @@ or taken away.
 
 ### Hidden in plain sight · `disguise`
 
-The app wears a neutral name and icon of the user's choosing and opens only
-past a PIN or fingerprint. Someone inspecting the phone sees nothing worth
-opening; someone forcing the wrong PIN sees an empty, boring app.
+The app offers a set of alternative names and icons — a calculator, a notes
+app, a unit converter — and the user switches to one with a single tap, for
+exactly the situation where the abuser controls or inspects the phone (owner
+decree 2026-09-01: this option is core, never dropped). The app opens only
+past a PIN or fingerprint; someone inspecting the phone sees nothing worth
+opening, and someone forcing the wrong PIN sees an empty, boring app.
 
 ## Emergency
 
