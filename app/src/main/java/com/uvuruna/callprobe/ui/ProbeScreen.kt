@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.uvuruna.callprobe.audio.RecordingEntry
+import com.uvuruna.callprobe.listen.ListenLog
 
 /**
  * The whole probe UI, one screen: pick an AudioSource, record manually or arm
@@ -45,6 +46,8 @@ fun ProbeScreen(
     vm: ProbeViewModel,
     onRequestManual: (Int) -> Unit,
     onRequestAuto: (Boolean, Int) -> Unit,
+    onRequestListen: (Boolean) -> Unit,
+    onExemptBattery: () -> Unit,
 ) {
     val state by vm.state.collectAsStateWithLifecycle()
     var sourceIdx by remember { mutableIntStateOf(0) }
@@ -98,6 +101,13 @@ fun ProbeScreen(
             )
         }
 
+        ListenCard(
+            state = state,
+            onToggle = onRequestListen,
+            onExemptBattery = onExemptBattery,
+            onClearLog = { vm.clearListenLog() },
+        )
+
         Text("Recordings", fontWeight = FontWeight.SemiBold, modifier = Modifier.padding(top = 4.dp))
         LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             items(state.recordings) { entry ->
@@ -105,6 +115,92 @@ fun ProbeScreen(
             }
         }
     }
+}
+
+/**
+ * The M0.5 panel: arm hours-long listening (levels only, no audio written),
+ * watch the live state, and read the last session's verdict — battery drain
+ * per hour and every gap where the OS suspended the listener.
+ */
+@Composable
+private fun ListenCard(
+    state: ProbeState,
+    onToggle: (Boolean) -> Unit,
+    onExemptBattery: () -> Unit,
+    onClearLog: () -> Unit,
+) {
+    Card(Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(12.dp), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+            Row(
+                Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text("Listen mode (M0.5)", fontWeight = FontWeight.SemiBold)
+                Switch(checked = state.listening, onCheckedChange = onToggle)
+            }
+            Text(
+                "Keeps the mic open for hours like the future SOS listener — " +
+                    "no audio saved, only battery and uptime. Arm it, unplug, leave overnight.",
+                fontSize = 12.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+
+            if (state.listening) {
+                LevelMeter(state.listenLevel, true)
+                Text(
+                    "listening ${state.listenMinutes} min · ${state.listenLoud} loud events · " +
+                        "green mic dot should be showing in the status bar",
+                    fontSize = 12.sp,
+                    color = Color(0xFF2E7D32),
+                    fontWeight = FontWeight.SemiBold,
+                )
+            }
+            if (state.listenError != null) {
+                Text("FAILED to open mic: ${state.listenError}", color = Color(0xFFD32F2F), fontSize = 12.sp)
+            }
+
+            if (!state.batteryExempt) {
+                Button(onClick = onExemptBattery) {
+                    Text("Allow background run (battery exemption)", fontSize = 12.sp)
+                }
+                Text(
+                    "Without this Samsung may kill the listener — the probe measures that too.",
+                    fontSize = 11.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+
+            val s = state.listenSummary
+            if (s != null) {
+                val v = listenVerdict(s)
+                Text(v.first, color = v.second, fontWeight = FontWeight.SemiBold, fontSize = 13.sp)
+                Text(
+                    "last session: ${s.durationMin} min · ${s.heartbeats} heartbeats · " +
+                        "${s.gaps} gaps · battery ${s.batteryStart}% → ${s.batteryEnd}%" +
+                        (s.drainPerHour?.let { " · %.1f%%/h".format(it) } ?: "") +
+                        (if (s.charged) " · CHARGER SEEN — drain invalid" else "") +
+                        " · ${s.loudEvents} loud",
+                    fontSize = 11.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+                Text(
+                    "clear log", color = Color(0xFFD32F2F), fontSize = 12.sp,
+                    modifier = Modifier.clickable { onClearLog() },
+                )
+            }
+        }
+    }
+}
+
+/** Turns a listen-session summary into the plain M0.5 verdict. */
+private fun listenVerdict(s: ListenLog.Summary): Pair<String, Color> = when {
+    s.gaps > 0 -> "OS INTERRUPTED the listener ${s.gaps}x" to Color(0xFFD32F2F)
+    s.charged -> "session ran on charger — repeat unplugged for the battery answer" to Color(0xFFF57C00)
+    s.drainPerHour == null -> "session too short — leave it running 6+ hours" to Color(0xFFF57C00)
+    s.drainPerHour <= 2.0 -> "SUSTAINABLE — %.1f%%/h, uninterrupted".format(s.drainPerHour) to Color(0xFF2E7D32)
+    s.drainPerHour <= 5.0 -> "COSTLY — %.1f%%/h, needs design work".format(s.drainPerHour) to Color(0xFFF57C00)
+    else -> "TOO EXPENSIVE — %.1f%%/h".format(s.drainPerHour) to Color(0xFFD32F2F)
 }
 
 @Composable

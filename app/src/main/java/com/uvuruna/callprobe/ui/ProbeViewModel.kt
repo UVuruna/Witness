@@ -1,12 +1,16 @@
 package com.uvuruna.callprobe.ui
 
 import android.app.Application
+import android.content.Context
+import android.os.PowerManager
 import androidx.annotation.RequiresPermission
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.uvuruna.callprobe.audio.RecordingEntry
 import com.uvuruna.callprobe.audio.RecordingStore
 import com.uvuruna.callprobe.call.CallMonitor
+import com.uvuruna.callprobe.listen.ListenLog
+import com.uvuruna.callprobe.listen.ListenService
 import com.uvuruna.callprobe.service.RecorderService
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,6 +24,13 @@ data class ProbeState(
     val source: String = "",
     val autoMode: Boolean = false,  // auto-record when a call is active
     val recordings: List<RecordingEntry> = emptyList(),
+    val listening: Boolean = false, // M0.5 continuous-listening probe
+    val listenLevel: Int = 0,
+    val listenMinutes: Long = 0,
+    val listenLoud: Int = 0,
+    val listenError: String? = null,
+    val listenSummary: ListenLog.Summary? = null,
+    val batteryExempt: Boolean = false,
 )
 
 /**
@@ -39,13 +50,23 @@ class ProbeViewModel(app: Application) : AndroidViewModel(app) {
     init {
         refresh()
         viewModelScope.launch {
+            var ticks = 0
             while (true) {
+                val now = System.currentTimeMillis()
                 _state.value = _state.value.copy(
                     recording = RecorderService.recording,
                     level = RecorderService.level,
                     source = RecorderService.currentSource,
+                    listening = ListenService.listening,
+                    listenLevel = ListenService.level,
+                    listenMinutes = if (ListenService.listening)
+                        (now - ListenService.startedAtMs) / 60_000 else 0,
+                    listenLoud = ListenService.loudEvents,
+                    listenError = ListenService.lastError,
                 )
                 if (!RecorderService.recording && _state.value.level != 0) refresh()
+                // The summary reads a file — refresh it every 10 s, not every tick.
+                if (ticks++ % 100 == 0) refresh()
                 delay(100)
             }
         }
@@ -80,13 +101,30 @@ class ProbeViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    fun setListenMode(enabled: Boolean) {
+        val app: Application = getApplication()
+        if (enabled) ListenService.start(app) else ListenService.stop(app)
+        viewModelScope.launch { delay(400); refresh() }
+    }
+
+    fun clearListenLog() {
+        ListenLog.clear(getApplication())
+        refresh()
+    }
+
     fun delete(entry: RecordingEntry) {
         RecordingStore.delete(entry)
         refresh()
     }
 
     fun refresh() {
-        _state.value = _state.value.copy(recordings = RecordingStore.list(getApplication()))
+        val app: Application = getApplication()
+        val pm = app.getSystemService(Context.POWER_SERVICE) as PowerManager
+        _state.value = _state.value.copy(
+            recordings = RecordingStore.list(app),
+            listenSummary = ListenLog.summary(app),
+            batteryExempt = pm.isIgnoringBatteryOptimizations(app.packageName),
+        )
     }
 
     override fun onCleared() {

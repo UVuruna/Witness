@@ -1,8 +1,11 @@
 package com.uvuruna.callprobe
 
 import android.Manifest
+import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
@@ -38,6 +41,17 @@ class MainActivity : ComponentActivity() {
                         },
                         onRequestAuto = { enabled, source ->
                             if (hasAudio()) vm.setAutoMode(enabled, source) else requestNeededPermissions()
+                        },
+                        onRequestListen = { enabled ->
+                            if (hasAudio()) vm.setListenMode(enabled) else requestNeededPermissions()
+                        },
+                        onExemptBattery = {
+                            startActivity(
+                                Intent(
+                                    Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS,
+                                    Uri.parse("package:$packageName"),
+                                )
+                            )
                         },
                     )
                 }

@@ -11,15 +11,17 @@ import kotlin.math.abs
 import kotlin.math.sqrt
 
 /**
- * Records PCM 16-bit mono audio from a chosen AudioSource into a WAV file,
- * while measuring what the microphone ACTUALLY delivers — peak amplitude,
- * average RMS and the ratio of silent buffers. Those numbers are the whole
- * point of the M0 probe: they tell us whether the device lets the mic hear
- * a phone call at all.
+ * Captures PCM 16-bit mono audio from a chosen AudioSource, measuring what
+ * the microphone ACTUALLY delivers — peak amplitude, average RMS and the
+ * ratio of silent buffers.
+ *
+ * With an outFile it also writes the audio as WAV (the M0 call probe); with
+ * outFile = null it keeps only the measurements, so it can run for hours as
+ * the M0.5 continuous-listening probe without filling storage.
  */
 class WavRecorder(
     private val source: Int,
-    private val outFile: File,
+    private val outFile: File?,
     private val onLevel: (Int) -> Unit,
 ) {
     companion object {
@@ -73,11 +75,11 @@ class WavRecorder(
         var silentBuffers = 0L
         var totalBuffers = 0L
         var rmsSum = 0.0
-        outFile.parentFile?.mkdirs()
-        val raf = RandomAccessFile(outFile, "rw")
+        outFile?.parentFile?.mkdirs()
+        val raf = outFile?.let { RandomAccessFile(it, "rw") }
         try {
-            raf.setLength(0)
-            raf.write(ByteArray(WAV_HEADER_SIZE.toInt()))  // placeholder header
+            raf?.setLength(0)
+            raf?.write(ByteArray(WAV_HEADER_SIZE.toInt()))  // placeholder header
             record.startRecording()
             while (running) {
                 val n = record.read(samples, 0, samples.size)
@@ -92,7 +94,7 @@ class WavRecorder(
                     if (a > bufPeak) bufPeak = a
                     sumSq += s.toDouble() * s.toDouble()
                 }
-                raf.write(bytes.array(), 0, n * 2)
+                raf?.write(bytes.array(), 0, n * 2)
                 totalSamples += n
                 totalBuffers++
                 if (bufPeak < SILENCE_PEAK) silentBuffers++
@@ -110,8 +112,10 @@ class WavRecorder(
                 silentRatio = silentBuffers.toDouble() / totalBuffers
                 rmsAvg = rmsSum / totalBuffers
             }
-            writeWavHeader(raf, totalSamples * 2)
-            raf.close()
+            if (raf != null) {
+                writeWavHeader(raf, totalSamples * 2)
+                raf.close()
+            }
         }
     }
 

@@ -30,6 +30,8 @@ TRIVIAL: set[str] = {
     "app/src/main/java/com/uvuruna/callprobe/audio/RecordingStore.kt",
     "app/src/main/java/com/uvuruna/callprobe/service/RecorderService.kt",
     "app/src/main/java/com/uvuruna/callprobe/call/CallMonitor.kt",
+    "app/src/main/java/com/uvuruna/callprobe/listen/ListenService.kt",
+    "app/src/main/java/com/uvuruna/callprobe/listen/ListenLog.kt",
     "app/src/main/java/com/uvuruna/callprobe/ui/ProbeViewModel.kt",
     "app/src/main/java/com/uvuruna/callprobe/ui/ProbeScreen.kt",
 }
