@@ -28,6 +28,7 @@ TRIVIAL: set[str] = {
     "app/src/main/java/com/uvuruna/callprobe/MainActivity.kt",
     "app/src/main/java/com/uvuruna/callprobe/audio/WavRecorder.kt",
     "app/src/main/java/com/uvuruna/callprobe/audio/Playback.kt",
+    "app/probe-tools/CallCap.java",
     "app/src/main/java/com/uvuruna/callprobe/audio/RecordingStore.kt",
     "app/src/main/java/com/uvuruna/callprobe/service/RecorderService.kt",
     "app/src/main/java/com/uvuruna/callprobe/call/CallMonitor.kt",

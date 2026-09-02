@@ -90,6 +90,7 @@ whole time (it cannot be hidden — a product design fact, not a bug).
 | `audio/RecordingStore.kt` | App-private WAV + JSON-sidecar storage; the AudioSource registry; per-file stats and the owner's by-ear verdict. |
 | `audio/Playback.kt` | Plays one recording back so the owner can judge whose voice was captured. |
 | `call/CallMonitor.kt` | TelephonyCallback (API 31+) / PhoneStateListener wrapper that fires on call start/end. |
+| [`probe-tools/`](probe-tools/___probe-tools.md) | Shell-identity call-audio probe (CallCap.java) — run via ADB, not installed as an app; measures the privileged VOICE_CALL path. |
 | `listen/ListenService.kt` | M0.5: hours-long mic foreground service — minute heartbeats, battery state, loud-event counter. |
 | `listen/ListenLog.kt` | M0.5: JSONL heartbeat log + last-session summary (drain %/h, OS-suspension gaps). |
 
