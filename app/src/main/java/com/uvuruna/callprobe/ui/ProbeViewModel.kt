@@ -6,6 +6,8 @@ import android.os.PowerManager
 import androidx.annotation.RequiresPermission
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.uvuruna.callprobe.audio.Heard
+import com.uvuruna.callprobe.audio.Playback
 import com.uvuruna.callprobe.audio.RecordingEntry
 import com.uvuruna.callprobe.audio.RecordingStore
 import com.uvuruna.callprobe.call.CallMonitor
@@ -22,6 +24,8 @@ data class ProbeState(
     val recording: Boolean = false,
     val level: Int = 0,             // live peak 0..32767
     val source: String = "",
+    val speaker: Boolean = false,   // force the loudspeaker while recording
+    val playing: String? = null,    // absolute path of the file being played back
     val autoMode: Boolean = false,  // auto-record when a call is active
     val recordings: List<RecordingEntry> = emptyList(),
     val listening: Boolean = false, // M0.5 continuous-listening probe
@@ -57,6 +61,7 @@ class ProbeViewModel(app: Application) : AndroidViewModel(app) {
                     recording = RecorderService.recording,
                     level = RecorderService.level,
                     source = RecorderService.currentSource,
+                    playing = Playback.playingPath,
                     listening = ListenService.listening,
                     listenLevel = ListenService.level,
                     listenMinutes = if (ListenService.listening)
@@ -72,8 +77,23 @@ class ProbeViewModel(app: Application) : AndroidViewModel(app) {
         }
     }
 
+    fun setSpeaker(on: Boolean) {
+        _state.value = _state.value.copy(speaker = on)
+    }
+
     fun startManual(source: Int) {
-        RecorderService.start(getApplication(), source, "manual")
+        RecorderService.start(getApplication(), source, "manual", _state.value.speaker)
+    }
+
+    /** Plays a finished recording so the owner can judge WHO is audible. */
+    fun play(entry: RecordingEntry) {
+        Playback.toggle(entry.wav) { }
+    }
+
+    /** Stores the owner's ear verdict — the actual M0 answer. */
+    fun setHeard(entry: RecordingEntry, heard: Heard) {
+        RecordingStore.writeHeard(entry, heard)
+        refresh()
     }
 
     fun stop() {
@@ -87,7 +107,9 @@ class ProbeViewModel(app: Application) : AndroidViewModel(app) {
         if (enabled) {
             val m = CallMonitor(
                 getApplication(),
-                onCallStart = { RecorderService.start(getApplication(), source, "call") },
+                onCallStart = {
+                    RecorderService.start(getApplication(), source, "call", _state.value.speaker)
+                },
                 onCallEnd = {
                     RecorderService.stop(getApplication())
                     viewModelScope.launch { delay(400); refresh() }
@@ -128,6 +150,7 @@ class ProbeViewModel(app: Application) : AndroidViewModel(app) {
     }
 
     override fun onCleared() {
+        Playback.stop()
         monitor?.stop()
         super.onCleared()
     }

@@ -27,6 +27,7 @@ from _guards_common import PROJECT_ROOT, iter_source_files  # noqa: E402
 TRIVIAL: set[str] = {
     "app/src/main/java/com/uvuruna/callprobe/MainActivity.kt",
     "app/src/main/java/com/uvuruna/callprobe/audio/WavRecorder.kt",
+    "app/src/main/java/com/uvuruna/callprobe/audio/Playback.kt",
     "app/src/main/java/com/uvuruna/callprobe/audio/RecordingStore.kt",
     "app/src/main/java/com/uvuruna/callprobe/service/RecorderService.kt",
     "app/src/main/java/com/uvuruna/callprobe/call/CallMonitor.kt",
