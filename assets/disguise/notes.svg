@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Notes — a disguise look for the app icon">
+  <rect x="8" y="8" width="112" height="112" rx="26" fill="#E9C46A"/>
+  <rect x="30" y="24" width="68" height="80" rx="8" fill="#FFFDF6"/>
+  <g stroke="#B9A06A" stroke-width="5" stroke-linecap="round">
+    <line x1="44" y1="46" x2="84" y2="46"/>
+    <line x1="44" y1="62" x2="84" y2="62"/>
+    <line x1="44" y1="78" x2="70" y2="78"/>
+  </g>
+</svg>

@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Witness — a shield holding a quotation mark: the exact words, kept">
+  <defs>
+    <linearGradient id="c-body" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#22375F"/>
+      <stop offset="1" stop-color="#0E1729"/>
+    </linearGradient>
+  </defs>
+
+  <path d="M64 8 L110 26 v40 c0 28-19 47-46 56-27-9-46-28-46-56V26 Z"
+        fill="url(#c-body)"/>
+
+  <!-- A quotation mark: a witness does not summarise, it quotes. Two commas,
+       the right one warm because it is the half that carries the proof. -->
+  <path d="M42 44 h20 v22 c0 12-7 19-18 22v-9c6-2 9-6 9-12h-11z"
+        fill="#FFFFFF"/>
+  <path d="M72 44 h20 v22 c0 12-7 19-18 22v-9c6-2 9-6 9-12h-11z"
+        fill="#F5B841"/>
+</svg>

@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-label="Witness — a sealed voice: a wax-seal disc around a waveform">
+  <defs>
+    <linearGradient id="d-seal" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#2A4372"/>
+      <stop offset="1" stop-color="#0E1729"/>
+    </linearGradient>
+  </defs>
+
+  <!-- A seal, because the promise is not only "recorded" but "unaltered". -->
+  <circle cx="64" cy="64" r="56" fill="url(#d-seal)"/>
+  <circle cx="64" cy="64" r="47" fill="none" stroke="#F5B841" stroke-width="3"
+          stroke-dasharray="4 7" stroke-linecap="round"/>
+
+  <g stroke="#FFFFFF" stroke-width="7" stroke-linecap="round">
+    <line x1="40" y1="57" x2="40" y2="71"/>
+    <line x1="52" y1="48" x2="52" y2="80"/>
+    <line x1="64" y1="40" x2="64" y2="88"/>
+    <line x1="76" y1="48" x2="76" y2="80"/>
+    <line x1="88" y1="57" x2="88" y2="71"/>
+  </g>
+</svg>
