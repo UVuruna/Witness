@@ -72,6 +72,19 @@ python tests/run_guards.py --fast  guards, fast (PostToolUse hook)
   is not a smaller version of the product; it is not the product. Enforced by
   `tests/hook_no_half_recording.py` (Stop hook, registered in
   `.claude/settings.json`) and pinned by `tests/test_half_recording_hook.py`.
+- **EVERY PHONE, OR IT DOES NOT COUNT** (owner decree 2026-09-11): a mechanism
+  that works on one manufacturer's phones is not a mechanism. The built-in
+  recorder in Samsung's or Xiaomi's own dialer is the standing example — it is
+  DEAD for this project and is never to be raised again, whatever a given
+  handset can do. A candidate must work across manufacturers or it does not
+  enter the list.
+- **EVERY OPTION ARRIVES WHOLE** (owner decree 2026-09-11): an idea is never
+  presented before its full price is known. Naming one means naming, in the same
+  breath: what we must build, what the owner must provide, every step the user
+  must take, everything that must be true but is not yet proven, what it costs,
+  and which phones it covers. An option offered without that list is a guess
+  wearing a solution's clothes, and four of them in one day is what this rule
+  exists to prevent.
 - **ONLY STEPS AN ORDINARY USER CAN DO** (owner decree 2026-09-11): a solution
   may never require developer options, wireless debugging, ADB, Shizuku, root,
   a firmware/CSC change, or any hidden setting — nor anything that must be
