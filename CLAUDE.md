@@ -39,8 +39,13 @@ made by the system recorder for transcription and vaulting only.
 ## How to run
 
 ```
-(no product code yet — M0 feasibility probe is the next milestone)
+gradlew :app:assembleDebug                       build the APK
+uv device android-phone <apk> --start-emulator   install on an emulator + screenshot
 ```
+
+JAVA_HOME must point at a JDK 17+ (this machine uses Android Studio's bundled
+JBR — see `gradle.properties`). The debug build deliberately drops FLAG_SECURE
+so screenshots work; the release build keeps it.
 
 ## How to test
 
@@ -60,6 +65,19 @@ python tests/run_guards.py --fast  guards, fast (PostToolUse hook)
   phone and looks through it": nothing in the gallery, file manager, share
   sheets, notification history, or recent-apps screen may reveal what this
   app holds.
+- **A RECORDING WITHOUT BOTH VOICES IS NOT A RESULT** (owner decree
+  2026-09-11): nothing may be delivered — no plan, no table, no feature, no
+  report — whose answer to "is the other party in the recording?" is no. A file
+  holding one side of a conversation proves nothing and protects nobody, so it
+  is not a smaller version of the product; it is not the product. Enforced by
+  `tests/hook_no_half_recording.py` (Stop hook, registered in
+  `.claude/settings.json`) and pinned by `tests/test_half_recording_hook.py`.
+- **ONLY STEPS AN ORDINARY USER CAN DO** (owner decree 2026-09-11): a solution
+  may never require developer options, wireless debugging, ADB, Shizuku, root,
+  a firmware/CSC change, or any hidden setting — nor anything that must be
+  re-armed after a reboot. The users are people under threat, often with the
+  abuser nearby; a path they cannot walk is not a path. This rules out every
+  privileged-capture route, whatever its technical merit.
 - **OFFICIAL APIS ONLY** (owner decree 2026-09-01): no Accessibility-API
   recording, no root paths, no reflection into blocked audio sources. If Play
   policy forbids it, this project does not do it — the users cannot afford to
@@ -80,5 +98,14 @@ python tests/run_guards.py --fast  guards, fast (PostToolUse hook)
 
 ## Open items
 
-- Final project name — candidates proposed 2026-09-01, owner has not picked yet.
-- M0 feasibility probe (mic capture during speakerphone call, real devices).
+- **The capture mechanism.** `CaptureRegistry` ships empty: no way of obtaining
+  a recording has yet been proven to satisfy BOTH new laws at once — both voices
+  in the file, and a setup an ordinary user can complete. Until one is, the app
+  says so on its setup screen. This is the project's single blocking question.
+- **Folder rename** `Safety` → `Witness` ([RENAME.md](RENAME.md)) — still not
+  executed; the tool refuses to run from inside the folder.
+- **applicationId** is `com.pebblesoft.toolbox` (neutral, as RENAME.md requires).
+  It can still change until the first store upload; after that it is forever.
+- **The probe** (`app/src/main/java/com/uvuruna/callprobe/`) is out of the
+  manifest and out of the product's path. It stays on disk until the owner says
+  it may be deleted.

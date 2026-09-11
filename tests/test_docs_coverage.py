@@ -36,8 +36,35 @@ TRIVIAL: set[str] = {
     "app/src/main/java/com/uvuruna/callprobe/listen/ListenLog.kt",
     "app/src/main/java/com/uvuruna/callprobe/ui/ProbeViewModel.kt",
     "app/src/main/java/com/uvuruna/callprobe/ui/ProbeScreen.kt",
+    # THE PRODUCT (M1, 2026-09-11) — Trivial files: hosts, plain data holders and
+    # declarative screens whose whole story is told by app/___app.md. A screen
+    # that grows real logic graduates to Standard in the same commit.
+    "app/src/main/java/com/pebblesoft/toolbox/MainActivity.kt",
+    "app/src/main/java/com/pebblesoft/toolbox/ToolboxApp.kt",
+    "app/src/main/java/com/pebblesoft/toolbox/data/Dao.kt",
+    "app/src/main/java/com/pebblesoft/toolbox/data/Db.kt",
+    "app/src/main/java/com/pebblesoft/toolbox/data/NumberRule.kt",
+    "app/src/main/java/com/pebblesoft/toolbox/data/Prefs.kt",
+    "app/src/main/java/com/pebblesoft/toolbox/ui/components/Pieces.kt",
+    "app/src/main/java/com/pebblesoft/toolbox/ui/theme/Theme.kt",
+    "app/src/main/java/com/pebblesoft/toolbox/ui/home/HomeScreen.kt",
+    "app/src/main/java/com/pebblesoft/toolbox/ui/recordings/RecordingsScreen.kt",
+    "app/src/main/java/com/pebblesoft/toolbox/ui/numbers/NumbersScreen.kt",
+    "app/src/main/java/com/pebblesoft/toolbox/ui/settings/SettingsScreen.kt",
+    "app/src/main/java/com/pebblesoft/toolbox/ui/setup/SetupScreen.kt",
 }
-STANDARD: set[str] = set()
+
+# THE PRODUCT — Standard files: each carries a decision that outlives its code
+# and is owed its own app/__about/{name}.md.
+STANDARD: set[str] = {
+    "app/src/main/java/com/pebblesoft/toolbox/vault/Vault.kt",
+    "app/src/main/java/com/pebblesoft/toolbox/rules/RecordingPolicy.kt",
+    "app/src/main/java/com/pebblesoft/toolbox/capture/CaptureSource.kt",
+    "app/src/main/java/com/pebblesoft/toolbox/data/CallRecord.kt",
+    "app/src/main/java/com/pebblesoft/toolbox/ui/AppViewModel.kt",
+    "app/src/main/java/com/pebblesoft/toolbox/ui/AppNav.kt",
+}
+
 ALGORITHMIC: set[str] = set()
 
 ALL_CLASSIFIED = TRIVIAL | STANDARD | ALGORITHMIC

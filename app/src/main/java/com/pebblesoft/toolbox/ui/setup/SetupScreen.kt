@@ -1,0 +1,170 @@
+package com.pebblesoft.toolbox.ui.setup
+
+import android.content.Context
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
+import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import com.pebblesoft.toolbox.R
+import com.pebblesoft.toolbox.capture.CaptureRegistry
+import com.pebblesoft.toolbox.capture.Guide
+import com.pebblesoft.toolbox.ui.components.EmptyState
+import com.pebblesoft.toolbox.ui.components.Section
+import com.pebblesoft.toolbox.ui.components.SoftCard
+
+/**
+ * The instructions screen — the one place the user is asked to DO something.
+ *
+ * Each step is numbered, written in one short sentence, and carries the button
+ * that takes her straight to the screen it talks about, so she never has to
+ * hunt through Settings. A step she has already completed shows a tick and
+ * stops asking.
+ *
+ * ONLY STEPS AN ORDINARY USER CAN DO (CLAUDE.md): if a mechanism cannot be
+ * explained as a short numbered list here, it does not ship. The empty state is
+ * deliberate and honest — a phone that cannot do this is told so plainly rather
+ * than walked into a setup that will not work.
+ */
+@Composable
+fun SetupScreen(onDone: () -> Unit) {
+    val context = LocalContext.current
+    val source = CaptureRegistry.candidate(context)
+    val guide = source?.guide(context)
+
+    if (guide == null) {
+        EmptyState(
+            icon = Icons.Filled.Info,
+            title = stringResource(R.string.setup_none_title),
+            detail = stringResource(R.string.setup_none_detail),
+        )
+        return
+    }
+
+    LazyColumn(
+        Modifier.fillMaxSize(),
+        contentPadding = androidx.compose.foundation.layout.PaddingValues(vertical = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(14.dp),
+    ) {
+        item {
+            Section {
+                Text(guide.headline, style = MaterialTheme.typography.headlineSmall)
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    stringResource(R.string.setup_intro),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+        }
+
+        itemsIndexed(guide.steps) { index, step ->
+            StepCard(index + 1, step, context)
+        }
+
+        if (guide.keepInMind.isNotEmpty()) {
+            item { KeepInMind(guide) }
+        }
+
+        item {
+            Section {
+                Button(onClick = onDone, modifier = Modifier.fillMaxWidth()) {
+                    Text(stringResource(R.string.setup_finish))
+                }
+            }
+        }
+
+        item { Spacer(Modifier.height(24.dp)) }
+    }
+}
+
+@Composable
+private fun StepCard(ordinal: Int, step: com.pebblesoft.toolbox.capture.Step, context: Context) {
+    val done = step.isDone(context)
+    Section {
+        SoftCard {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    Modifier
+                        .size(30.dp)
+                        .background(
+                            if (done) MaterialTheme.colorScheme.primary
+                            else MaterialTheme.colorScheme.surfaceVariant,
+                            CircleShape,
+                        ),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    if (done) {
+                        Icon(
+                            Icons.Filled.Check,
+                            contentDescription = stringResource(R.string.setup_done_marker),
+                            tint = MaterialTheme.colorScheme.onPrimary,
+                            modifier = Modifier.size(18.dp),
+                        )
+                    } else {
+                        Text("$ordinal", style = MaterialTheme.typography.labelLarge)
+                    }
+                }
+                Spacer(Modifier.width(12.dp))
+                Text(step.title, style = MaterialTheme.typography.titleMedium)
+            }
+            Spacer(Modifier.height(10.dp))
+            Text(step.detail, style = MaterialTheme.typography.bodyMedium)
+
+            step.openScreen?.let { intent ->
+                Spacer(Modifier.height(12.dp))
+                OutlinedButton(
+                    onClick = { runCatching { context.startActivity(intent) } },
+                    modifier = Modifier.fillMaxWidth(),
+                ) {
+                    Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = null)
+                    Spacer(Modifier.width(8.dp))
+                    Text(stringResource(R.string.setup_open))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun KeepInMind(guide: Guide) {
+    Section(stringResource(R.string.setup_keep_in_mind)) {
+        SoftCard(tone = MaterialTheme.colorScheme.tertiaryContainer) {
+            guide.keepInMind.forEach { line ->
+                Row(Modifier.padding(vertical = 4.dp)) {
+                    Text("•  ", color = MaterialTheme.colorScheme.onTertiaryContainer)
+                    Text(
+                        line,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onTertiaryContainer,
+                    )
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  lang-ok-begin: customer-facing copy, Serbian (Latin). The users are Serbian
+  speakers; this file is the app's voice, not its code.
+-->
+<resources>
+    <string name="app_name">Toolbox</string>
+
+    <string name="nav_home">Početna</string>
+    <string name="nav_recordings">Snimci</string>
+    <string name="nav_numbers">Brojevi</string>
+    <string name="nav_settings">Podešavanja</string>
+
+    <!-- Home -->
+    <string name="home_greeting">Sve je na svom mestu</string>
+    <string name="home_state_ready">Snimanje je uključeno</string>
+    <string name="home_state_ready_detail">Pozivi koje pokrivaju tvoje liste čuvaju se sami. Tokom razgovora ne moraš ništa da radiš.</string>
+    <string name="home_state_setup">Fali još jedan korak</string>
+    <string name="home_state_setup_detail">Dok ga ne završiš, pozivi se ne čuvaju.</string>
+    <string name="home_setup_button">Pokaži mi šta da uradim</string>
+    <string name="home_covered_title">Šta se čuva</string>
+    <string name="home_covered_all">Svaki poziv</string>
+    <string name="home_covered_whitelist">Samo brojevi sa tvoje liste za snimanje</string>
+    <string name="home_covered_unknown_record">I nepoznati brojevi</string>
+    <string name="home_covered_unknown_skip">Nepoznati brojevi se preskaču</string>
+    <string name="home_recent_title">Najnovije</string>
+    <string name="home_recent_empty">Još ničega nema. Prvi snimak se ovde pojavi sam.</string>
+    <string name="home_open_all">Vidi sve</string>
+
+    <!-- Setup -->
+    <string name="setup_title">Podesi jednom</string>
+    <string name="setup_intro">Uradi ove korake jednom. Posle toga se svaki poziv čuva sam — nikada ne diraš aplikaciju dok telefon zvoni.</string>
+    <string name="setup_open">Otvori</string>
+    <string name="setup_done_marker">Urađeno</string>
+    <string name="setup_keep_in_mind">Zapamti</string>
+    <string name="setup_finish">Završila sam</string>
+    <string name="setup_none_title">Na ovom telefonu još ne može</string>
+    <string name="setup_none_detail">Ovaj telefon ne može da sačuva poziv tako da se čuju oba glasa. Aplikacija neće da se pravi da može. Proveri ponovo posle sledeće nadogradnje.</string>
+
+    <!-- Recordings -->
+    <string name="rec_title">Snimci</string>
+    <string name="rec_search">Traži po imenu ili broju</string>
+    <string name="rec_empty_title">Još nema snimaka</string>
+    <string name="rec_empty_detail">Kada se završi poziv koji pokrivaju tvoje liste, pojaviće se ovde.</string>
+    <string name="rec_today">Danas</string>
+    <string name="rec_yesterday">Juče</string>
+    <string name="rec_this_week">Ranije ove nedelje</string>
+    <string name="rec_older">Starije</string>
+    <string name="rec_incoming">Dolazni</string>
+    <string name="rec_outgoing">Odlazni</string>
+    <string name="rec_unknown_number">Nepoznat broj</string>
+    <string name="rec_quality_evidence">Oba glasa</string>
+    <string name="rec_quality_unverified">Još nije provereno</string>
+    <string name="rec_quality_failed">Neupotrebljivo</string>
+    <string name="rec_transcript_none">Nema teksta</string>
+    <string name="rec_transcript_pending">Pišem tekst…</string>
+    <string name="rec_transcript_done">Tekst je spreman</string>
+    <string name="rec_transcript_failed">Tekst nije uspeo</string>
+    <string name="rec_count">%1$d snimaka</string>
+
+    <!-- Recording detail -->
+    <string name="detail_play">Pusti</string>
+    <string name="detail_pause">Pauza</string>
+    <string name="detail_transcript">Tekst razgovora</string>
+    <string name="detail_transcript_empty">Tekst još nije napravljen.</string>
+    <string name="detail_seal_ok">Zapečaćeno i nepromenjeno</string>
+    <string name="detail_seal_broken">Fajl se više ne poklapa sa pečatom</string>
+    <string name="detail_seal_explain">Pečat se uzima čim se snimak zatvori. Dok se poklapa, snimak može da posluži kao dokaz da ništa nije menjano.</string>
+    <string name="detail_share">Podeli kopiju</string>
+    <string name="detail_delete">Obriši</string>
+    <string name="detail_delete_confirm">Da obrišem ovaj snimak zauvek? Ne može da se vrati.</string>
+    <string name="share_warning_title">Pre nego što podeliš</string>
+    <string name="share_warning_body">Kopija koju podeliš izlazi iz ove aplikacije. Ko je dobije može da je zadrži, i ostaće u aplikaciji kojom je šalješ. Podeli samo sa nekim kome veruješ.</string>
+    <string name="share_continue">Ipak podeli</string>
+
+    <!-- Numbers -->
+    <string name="numbers_title">Brojevi</string>
+    <string name="numbers_whitelist">Uvek snimaj</string>
+    <string name="numbers_blacklist">Nikad ne snimaj</string>
+    <string name="numbers_whitelist_empty">Ovde još nema brojeva.</string>
+    <string name="numbers_blacklist_empty">Ovde još nema brojeva.</string>
+    <string name="numbers_add">Dodaj broj</string>
+    <string name="numbers_from_contacts">Izaberi iz kontakata</string>
+    <string name="numbers_type_it">Ukucaj broj</string>
+    <string name="numbers_remove">Ukloni</string>
+    <string name="numbers_rules_title">Svi ostali</string>
+    <string name="numbers_default_all">Snimaj svaki poziv</string>
+    <string name="numbers_default_all_detail">Ništa ne promakne. Brojevi sa liste „nikad ne snimaj" se i dalje preskaču.</string>
+    <string name="numbers_default_whitelist">Snimaj samo moju listu</string>
+    <string name="numbers_default_whitelist_detail">Čuvaju se samo brojevi sa liste „uvek snimaj".</string>
+    <string name="numbers_unknown_title">Brojevi kojih nema u kontaktima</string>
+    <string name="numbers_unknown_record">Snimaj i njih</string>
+    <string name="numbers_unknown_skip">Preskoči ih</string>
+
+    <!-- Settings -->
+    <string name="settings_title">Podešavanja</string>
+    <string name="settings_lock_section">Zaključavanje</string>
+    <string name="settings_pin">PIN</string>
+    <string name="settings_pin_set">Promeni PIN</string>
+    <string name="settings_pin_unset">Postavi PIN</string>
+    <string name="settings_biometric">Otvaraj otiskom prsta</string>
+    <string name="settings_look_section">Kako aplikacija izgleda na tvom telefonu</string>
+    <string name="settings_look_real">Svoje ime i ikona</string>
+    <string name="settings_look_neutral">Neutralno ime i ikona</string>
+    <string name="settings_look_detail">Ovo možeš da menjaš kad god hoćeš. Menja se samo ono što je na tvom telefonu.</string>
+    <string name="settings_storage_section">Prostor</string>
+    <string name="settings_storage_used">Snimci zauzimaju %1$s</string>
+    <string name="settings_about_section">O aplikaciji</string>
+    <string name="settings_version">Verzija %1$s</string>
+
+    <!-- Lock -->
+    <string name="lock_title">Unesi svoj PIN</string>
+    <string name="lock_wrong">PIN nije tačan</string>
+    <string name="lock_biometric">Otisak prsta</string>
+    <string name="lock_biometric_prompt">Otključaj</string>
+
+    <!-- Common -->
+    <string name="cancel">Otkaži</string>
+    <string name="save">Sačuvaj</string>
+    <string name="delete">Obriši</string>
+    <string name="back">Nazad</string>
+    <string name="close">Zatvori</string>
+</resources>
+<!-- lang-ok-end -->

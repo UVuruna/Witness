@@ -1,100 +1,88 @@
-# app/ — M0/M0.5 feasibility probe (throwaway)
+# app/ — the Android app
 
-Not the product. This is the **feasibility harness** from
-[docs/PLAN.md](../docs/PLAN.md). It answers the questions the project hinges
-on, one throwaway screen, two probes:
+Two things live here: **the product** (`com.pebblesoft.toolbox`, the app a user
+installs) and **the M0/M0.5 feasibility probe** (`com.uvuruna.callprobe`), which
+is throwaway and no longer wired into the manifest.
 
-> **M0 — call audio:** when a phone call is active, what does each audio
-> source actually deliver to a third-party app on THIS device — both voices,
-> only the user, only the far side, or nothing?
->
-> **M0.5 — continuous listening:** can a microphone foreground service run for
-> hours, the way the SOS wake-phrase listener must — at what battery cost, and
-> does the OS suspend it?
+Navigation: [README](../README.md) · [ARCHITECTURE](../docs/ARCHITECTURE.md) ·
+[PLAN](../docs/PLAN.md)
 
-**Neither question is answered yet.** An earlier round wrote "answered:
-silence" into this file without a single measurement behind it — no recording,
-no device log, no evidence entry — and the whole product plan was then bent
-around that unmeasured sentence. The claim is withdrawn; the answer comes from
-the matrix below, run on a real phone, or it does not exist.
+---
 
-It is documented here as one module (its files are Trivial per
-[DOCS.md](../../../rules/DOCS.md)); at **M1** the real subsystems replace it and
-graduate to their own `__about/` docs. Nothing here ships to Play.
+## The product
 
-## What it does
+A neutral-looking app that keeps recordings of calls as sealed, encrypted
+evidence, decides what to keep from the user's own lists, and asks the user for
+setup exactly once.
 
-1. Pick an `AudioSource`. Ordinary sources (MIC, VOICE_RECOGNITION,
-   VOICE_COMMUNICATION, UNPROCESSED, CAMCORDER) are what any app may open.
-   **Privileged sources** (VOICE_CALL, VOICE_UPLINK, VOICE_DOWNLINK,
-   REMOTE_SUBMIX) are the ones that actually carry telephony audio; the
-   platform reserves them for callers holding `CAPTURE_AUDIO_OUTPUT`, so an
-   ordinary app is expected to be refused. The probe offers them anyway —
-   a recorded refusal, with the device's own error text, is a measurement;
-   an assumed one is not.
-2. Choose the route: **force loudspeaker** or leave the call on the earpiece.
-   The loudspeaker is the only lever an ordinary app has (it puts the far
-   side's voice into the room where the microphone can reach it), so every
-   source is measured both ways.
-3. Record manually ("Record now") or automatically when a call goes off-hook
-   ("Auto on call").
-4. While recording, a foreground service (`type=microphone`) captures 16 kHz
-   mono PCM to an app-private WAV and measures **peak amplitude** and the
-   **ratio of silent buffers**.
-5. **Play the recording back inside the app and say who you hear** — BOTH
-   voices / only ME / only the OTHER side / nothing. This is the M0 answer.
-   Amplitude can prove that sound arrived; only the owner's ear can say whose
-   voice it was, and that distinction is the entire question.
+Two project laws shape almost every file here:
 
-### The measurement protocol
+- **A RECORDING WITHOUT BOTH VOICES IS NOT A RESULT** — `capture.CaptureRegistry`
+  physically refuses to register a source that cannot deliver both voices, and
+  `data.Quality` rides along with every recording so no screen can quietly show
+  a half file as evidence.
+- **ONLY STEPS AN ORDINARY USER CAN DO** — every setup instruction is a numbered
+  `capture.Step` with, wherever possible, the intent that opens the exact screen
+  it talks about.
 
-Two people, one real call, one recording per row:
+### Files
 
-| | earpiece | loudspeaker |
-|---|---|---|
-| MIC | | |
-| VOICE_RECOGNITION | | |
-| VOICE_COMMUNICATION | | |
-| UNPROCESSED | | |
-| CAMCORDER | | |
-| VOICE_CALL *(privileged)* | | |
-| VOICE_UPLINK *(privileged)* | | |
-| VOICE_DOWNLINK *(privileged)* | | |
-| REMOTE_SUBMIX *(privileged)* | | |
+| File | Role | Tier |
+|------|------|------|
+| `MainActivity.kt` | The single host. Sets `FLAG_SECURE` so the app never shows in recents or a screenshot. | Trivial |
+| `ToolboxApp.kt` | Builds the app's parts once — database, vault, preferences, policy. | Trivial |
+| `data/CallRecord.kt` | One recorded call, and what it is worth as evidence. | [Standard](__about/CallRecord.md) |
+| `data/NumberRule.kt` | One number the user decided about; the whitelist and blacklist are one table. | Trivial |
+| `data/Dao.kt` | Room queries for records and rules. | Trivial |
+| `data/Db.kt` | The vault's index. | Trivial |
+| `data/Prefs.kt` | The user's settings, declared whole in one place. | Trivial |
+| `rules/RecordingPolicy.kt` | THE decision: is this call recorded, and why. | [Standard](__about/RecordingPolicy.md) |
+| `vault/Vault.kt` | Encrypted storage, the seal, and the only door to the bytes. | [Standard](__about/Vault.md) |
+| `capture/CaptureSource.kt` | The boundary every recording mechanism plugs into. | [Standard](__about/CaptureSource.md) |
+| `ui/AppNav.kt` | The shell: four tabs and the setup flow. | [Standard](__about/AppNav.md) |
+| `ui/AppViewModel.kt` | The single state holder behind every screen. | [Standard](__about/AppViewModel.md) |
+| `ui/theme/Theme.kt` | The calm palette and the slightly larger body type. | Trivial |
+| `ui/components/Pieces.kt` | Shared card, section, empty state and pill. | Trivial |
+| `ui/home/HomeScreen.kt` | One glance: is the phone protecting me right now. | Trivial |
+| `ui/recordings/RecordingsScreen.kt` | The data section — grouped by person, then time, with search. | Trivial |
+| `ui/numbers/NumbersScreen.kt` | The two lists and the two defaults. | Trivial |
+| `ui/settings/SettingsScreen.kt` | Lock, how the app looks, storage, version. | Trivial |
+| `ui/setup/SetupScreen.kt` | The numbered instructions, and the honest empty state. | Trivial |
 
-During each recording: the far side speaks alone for ~10 seconds, then the
-owner speaks alone for ~10 seconds. Play it back afterwards and tap the
-verdict — that ordering makes "only me" and "only them" unmistakable.
+User-facing copy lives in `res/values/strings.xml` (English) and
+`res/values-sr/strings.xml` (Serbian) — never hard-coded in a composable.
 
-### Listen mode (M0.5)
+### What is not built yet
 
-The **Listen mode** card arms an hours-long microphone foreground service
-(`listen/ListenService.kt`) that writes NO audio — it keeps the mic open
-levels-only, logs a heartbeat every minute (battery %, charging, peak,
-loud-event count) to an app-private JSONL, and the card turns the last
-session into a verdict: battery drain per hour, and heartbeat gaps = every
-moment the OS suspended the listener. Procedure: arm, grant the battery
-exemption, unplug, leave overnight, read the verdict; a clap test checks
-the loud-event counter, and the status bar must show the green mic dot the
-whole time (it cannot be hidden — a product design fact, not a bug).
+The capture mechanism itself. `CaptureRegistry` is empty on purpose: until a
+mechanism is proven to put both voices in the file on ordinary phones, the app
+says so on the setup screen rather than promising anything.
 
-## Files
+---
+
+## The M0/M0.5 probe (throwaway, `com.uvuruna.callprobe`)
+
+The feasibility harness from [PLAN](../docs/PLAN.md). It measured what each audio
+source delivers during a call, and what an hours-long microphone service costs in
+battery. It is no longer in the manifest and ships to nobody.
+
+**What it measured** on one Samsung device (2026-09-02): the ADB shell identity
+opens the privileged sources, the microphone pipe writes real audio, and the
+phone's own call recording is disabled by its regional firmware. What it never
+measured: a live call.
+
+That path is now closed by decree anyway — ONLY STEPS AN ORDINARY USER CAN DO
+rules out shell identity, Shizuku, ADB and root, whatever they can technically do.
+The probe stays on disk only until the owner says it may be deleted.
 
 | File | Role |
 |------|------|
-| `MainActivity.kt` | Single-screen host; requests RECORD_AUDIO + READ_PHONE_STATE, shows ProbeScreen. |
-| `ui/ProbeScreen.kt` | Compose UI: source chips (ordinary + privileged), route switch, live level meter, record/auto controls, recording list with playback and the by-ear verdict. |
-| `ui/ProbeViewModel.kt` | Starts/stops the service, polls the live level, toggles call-auto mode and the speaker route, drives playback, stores verdicts. |
-| `service/RecorderService.kt` | Foreground service (type=microphone) owning one WavRecorder; the only place the mic opens and the only place the audio route is set. |
-| `audio/WavRecorder.kt` | Captures PCM and measures peak / RMS / silence ratio; writes WAV when given a file, levels-only when not. |
-| `audio/RecordingStore.kt` | App-private WAV + JSON-sidecar storage; the AudioSource registry; per-file stats and the owner's by-ear verdict. |
-| `audio/Playback.kt` | Plays one recording back so the owner can judge whose voice was captured. |
-| `call/CallMonitor.kt` | TelephonyCallback (API 31+) / PhoneStateListener wrapper that fires on call start/end. |
-| [`probe-tools/`](probe-tools/___probe-tools.md) | Shell-identity call-audio probe (CallCap.java) — run via ADB, not installed as an app; measures the privileged VOICE_CALL path. |
-| `listen/ListenService.kt` | M0.5: hours-long mic foreground service — minute heartbeats, battery state, loud-event counter. |
-| `listen/ListenLog.kt` | M0.5: JSONL heartbeat log + last-session summary (drain %/h, OS-suspension gaps). |
+| `src/main/java/com/uvuruna/callprobe/` | The probe app: one screen, a recorder service, a listen service, playback. |
+| [`probe-tools/`](probe-tools/___probe-tools.md) | Shell-identity call-audio probe, run over ADB. |
 
 ## Privacy note
 
-Even as a throwaway, it obeys the project laws: recordings live only in
-`filesDir/recordings/`, never shared storage; nothing leaves the device.
+Even the throwaway obeyed the project laws: recordings stayed in app-private
+storage, nothing left the device. The product tightens that further — everything
+is encrypted at rest and nothing is exposed beyond a temporary shared copy the
+user explicitly asks for.

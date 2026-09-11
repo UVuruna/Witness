@@ -14,6 +14,7 @@ this file covers the folder.
 | `test_config_sections.py` | THE CONFIG SECTION LAW over `CONFIG_FILES` (empty until the first config/data table exists). |
 | `test_docs_coverage.py` | MD-First tiers: every source file classified, every Standard/Algorithmic file has its `__about`/`__flow` doc. |
 | `test_doc_links.py` | Navigation chain: every `.md` reachable from `README.md`, no broken relative link. |
+| `test_half_recording_hook.py` | THE HALF-RECORDING BAN: `.claude/hooks/no_half_recording.py` must block a turn whose final message delivers a result missing the other party's voice, and must let a real both-sides solution through. |
 | `_guards_common.py` | Shared walk helpers (excluded dirs, source extensions). |
 
 ## Connections
