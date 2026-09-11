@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
@@ -34,25 +35,43 @@ import androidx.compose.ui.unit.dp
  * that will drift away from the others.
  */
 
-/** A titled block of content. The title is optional — some blocks speak for themselves. */
+/**
+ * A titled block of content. The title is optional — some blocks speak for
+ * themselves.
+ *
+ * The content is capped at [READING_WIDTH] and centred. On a phone held
+ * upright that cap never bites; in landscape, on a tablet or on a foldable it
+ * is the whole difference between a readable column and a line of text
+ * stranded at the left edge of an empty card (SPACE & LEGIBILITY).
+ */
 @Composable
 fun Section(
     title: String? = null,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
-    Column(modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
-        if (title != null) {
-            Text(
-                title,
-                style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(start = 4.dp, bottom = 8.dp),
-            )
+    Box(modifier.fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
+        Column(
+            Modifier
+                .widthIn(max = READING_WIDTH)
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+        ) {
+            if (title != null) {
+                Text(
+                    title,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(start = 4.dp, bottom = 8.dp),
+                )
+            }
+            content()
         }
-        content()
     }
 }
+
+/** As wide as a block of text may get before the eye starts to lose the line. */
+val READING_WIDTH = 560.dp
 
 @Composable
 fun SoftCard(
