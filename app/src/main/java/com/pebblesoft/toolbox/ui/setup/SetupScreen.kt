@@ -10,11 +10,11 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.staggeredgrid.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
@@ -35,7 +35,9 @@ import com.pebblesoft.toolbox.R
 import com.pebblesoft.toolbox.capture.CaptureRegistry
 import com.pebblesoft.toolbox.capture.Guide
 import com.pebblesoft.toolbox.ui.components.EmptyState
+import com.pebblesoft.toolbox.ui.components.AdaptiveBody
 import com.pebblesoft.toolbox.ui.components.Section
+import com.pebblesoft.toolbox.ui.components.fullWidthItem
 import com.pebblesoft.toolbox.ui.components.SoftCard
 
 /**
@@ -66,12 +68,8 @@ fun SetupScreen(onDone: () -> Unit) {
         return
     }
 
-    LazyColumn(
-        Modifier.fillMaxSize(),
-        contentPadding = androidx.compose.foundation.layout.PaddingValues(vertical = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp),
-    ) {
-        item {
+    AdaptiveBody(spacing = 14.dp) {
+        fullWidthItem {
             Section {
                 Text(guide.headline, style = MaterialTheme.typography.headlineSmall)
                 Spacer(Modifier.height(8.dp))
@@ -91,15 +89,15 @@ fun SetupScreen(onDone: () -> Unit) {
             item { KeepInMind(guide) }
         }
 
-        item {
+        fullWidthItem {
             Section {
-                Button(onClick = onDone, modifier = Modifier.fillMaxWidth()) {
+                Button(onClick = onDone, modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp)) {
                     Text(stringResource(R.string.setup_finish))
                 }
             }
         }
 
-        item { Spacer(Modifier.height(24.dp)) }
+        fullWidthItem { Spacer(Modifier.height(24.dp)) }
     }
 }
 

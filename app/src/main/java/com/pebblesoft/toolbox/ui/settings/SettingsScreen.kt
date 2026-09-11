@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -18,7 +17,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.pebblesoft.toolbox.R
+import com.pebblesoft.toolbox.ui.components.AdaptiveBody
 import com.pebblesoft.toolbox.ui.components.Section
+import com.pebblesoft.toolbox.ui.components.fullWidthItem
 import com.pebblesoft.toolbox.ui.components.SoftCard
 import java.util.Locale
 
@@ -38,11 +39,7 @@ fun SettingsScreen(
     storageBytes: Long,
     versionName: String,
 ) {
-    LazyColumn(
-        Modifier.fillMaxSize(),
-        contentPadding = androidx.compose.foundation.layout.PaddingValues(vertical = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(18.dp),
-    ) {
+    AdaptiveBody(spacing = 18.dp) {
         item {
             Section(stringResource(R.string.settings_lock_section)) {
                 SoftCard {
@@ -92,7 +89,7 @@ fun SettingsScreen(
             }
         }
 
-        item { Spacer(Modifier.height(24.dp)) }
+        fullWidthItem { Spacer(Modifier.height(24.dp)) }
     }
 }
 

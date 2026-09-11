@@ -10,8 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.CallMade
 import androidx.compose.material.icons.automirrored.filled.CallReceived
@@ -37,7 +36,9 @@ import com.pebblesoft.toolbox.data.Quality
 import com.pebblesoft.toolbox.data.TranscriptState
 import com.pebblesoft.toolbox.ui.components.EmptyState
 import com.pebblesoft.toolbox.ui.components.Pill
+import com.pebblesoft.toolbox.ui.components.AdaptiveBody
 import com.pebblesoft.toolbox.ui.components.Section
+import com.pebblesoft.toolbox.ui.components.fullWidthItem
 import com.pebblesoft.toolbox.ui.components.SoftCard
 import java.util.Calendar
 import java.util.Locale
@@ -67,12 +68,8 @@ fun RecordingsScreen(
 
     val groups = remember(matching) { groupByPerson(matching) }
 
-    LazyColumn(
-        Modifier.fillMaxSize(),
-        contentPadding = androidx.compose.foundation.layout.PaddingValues(vertical = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(14.dp),
-    ) {
-        item {
+    AdaptiveBody(spacing = 14.dp) {
+        fullWidthItem {
             Section {
                 OutlinedTextField(
                     value = query,
@@ -86,7 +83,7 @@ fun RecordingsScreen(
         }
 
         if (matching.isEmpty()) {
-            item {
+            fullWidthItem {
                 EmptyState(
                     icon = Icons.Filled.GraphicEq,
                     title = stringResource(R.string.rec_empty_title),
@@ -96,7 +93,7 @@ fun RecordingsScreen(
         }
 
         groups.forEach { group ->
-            item(key = "head-${group.key}") {
+            fullWidthItem(key = "head-${group.key}") {
                 Section {
                     Text(
                         group.title,
@@ -115,7 +112,7 @@ fun RecordingsScreen(
             }
         }
 
-        item { Spacer(Modifier.height(24.dp)) }
+        fullWidthItem { Spacer(Modifier.height(24.dp)) }
     }
 }
 

@@ -7,9 +7,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.ErrorOutline
@@ -29,7 +29,9 @@ import com.pebblesoft.toolbox.capture.CaptureSource
 import com.pebblesoft.toolbox.data.DefaultRule
 import com.pebblesoft.toolbox.data.UnknownRule
 import com.pebblesoft.toolbox.ui.AppState
+import com.pebblesoft.toolbox.ui.components.AdaptiveBody
 import com.pebblesoft.toolbox.ui.components.Section
+import com.pebblesoft.toolbox.ui.components.fullWidthItem
 import com.pebblesoft.toolbox.ui.components.SoftCard
 import com.pebblesoft.toolbox.ui.components.StatusCard
 import com.pebblesoft.toolbox.ui.recordings.RecordingRow
@@ -50,12 +52,8 @@ fun HomeScreen(
 ) {
     val ready = state.captureStatus == CaptureSource.Status.READY
 
-    LazyColumn(
-        Modifier.fillMaxSize(),
-        contentPadding = androidx.compose.foundation.layout.PaddingValues(vertical = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(22.dp),
-    ) {
-        item {
+    AdaptiveBody(spacing = 22.dp) {
+        fullWidthItem {
             Section {
                 if (ready) {
                     StatusCard(
@@ -75,6 +73,7 @@ fun HomeScreen(
                     ) {
                         Button(
                             onClick = onOpenSetup,
+                            modifier = Modifier.heightIn(min = 48.dp),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = MaterialTheme.colorScheme.onTertiaryContainer,
                                 contentColor = MaterialTheme.colorScheme.tertiaryContainer,
@@ -151,6 +150,6 @@ fun HomeScreen(
             }
         }
 
-        item { Spacer(Modifier.height(24.dp)) }
+        fullWidthItem { Spacer(Modifier.height(24.dp)) }
     }
 }

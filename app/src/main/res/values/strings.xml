@@ -30,6 +30,22 @@
     <string name="home_recent_empty">Nothing yet. The first recording appears here by itself.</string>
     <string name="home_open_all">See all</string>
 
+    <!-- Service -->
+    <string name="service_notification">Running</string>
+
+    <!-- Shizuku setup guide -->
+    <string name="guide_shizuku_headline">Turn on call saving</string>
+    <string name="guide_shizuku_1_title">Install the helper</string>
+    <string name="guide_shizuku_1_detail">This app needs a small free helper called Shizuku to save calls. Tap Open to get it, then come back here.</string>
+    <string name="guide_shizuku_2_title">Turn on wireless debugging</string>
+    <string name="guide_shizuku_2_detail">Tap Open. If you do not see \"Developer options\", go to Settings, About phone, and tap \"Build number\" seven times first. Inside Developer options, turn on \"Wireless debugging\".</string>
+    <string name="guide_shizuku_3_title">Start the helper</string>
+    <string name="guide_shizuku_3_detail">Tap Open to go to Shizuku. Press \"Pairing\", enter the code it shows, then press \"Start\". It will say \"Shizuku is running\".</string>
+    <string name="guide_shizuku_4_title">Allow this app</string>
+    <string name="guide_shizuku_4_detail">Come back here. When Shizuku asks, tap \"Allow\". That is the last step — you are protected.</string>
+    <string name="guide_shizuku_keep_reboot">If you restart your phone, open this app once and tap the button on the home screen to turn saving back on. It takes a few seconds.</string>
+    <string name="home_rearm">Turn saving back on</string>
+
     <!-- Setup -->
     <string name="setup_title">Set up once</string>
     <string name="setup_intro">Do these steps once. After that every call is saved by itself — you never touch the app while the phone rings.</string>

@@ -39,6 +39,14 @@ Two project laws shape almost every file here:
 | `rules/RecordingPolicy.kt` | THE decision: is this call recorded, and why. | [Standard](__about/RecordingPolicy.md) |
 | `vault/Vault.kt` | Encrypted storage, the seal, and the only door to the bytes. | [Standard](__about/Vault.md) |
 | `capture/CaptureSource.kt` | The boundary every recording mechanism plugs into. | [Standard](__about/CaptureSource.md) |
+| `capture/RecordingCoordinator.kt` | Decide → record → seal → file; one call in, one row out. | [Standard](__about/RecordingCoordinator.md) |
+| `capture/CallWatcher.kt` | The eyes: call start/end, and the caller's number. | [Standard](__about/CallWatcher.md) |
+| `capture/CaptureService.kt` | Foreground service (`microphone`) that keeps the watcher alive. | Trivial |
+| `capture/BootReceiver.kt` | Restarts the watcher after a reboot. | Trivial |
+| `capture/shizuku/IRecorderService.aidl` | The AIDL contract to the privileged process. | Trivial |
+| `capture/shizuku/PrivilegedRecorder.kt` | The shell-side recorder — the one process that hears the call. | [Standard](__about/PrivilegedRecorder.md) |
+| `capture/shizuku/ShizukuManager.kt` | The one gatekeeper to the borrowed privilege. | [Standard](__about/ShizukuManager.md) |
+| `capture/shizuku/ShizukuCaptureSource.kt` | The Shizuku mechanism + its numbered setup guide. | Trivial |
 | `ui/AppNav.kt` | The shell: four tabs and the setup flow. | [Standard](__about/AppNav.md) |
 | `ui/AppViewModel.kt` | The single state holder behind every screen. | [Standard](__about/AppViewModel.md) |
 | `ui/theme/Theme.kt` | The calm palette and the slightly larger body type. | Trivial |
@@ -52,11 +60,15 @@ Two project laws shape almost every file here:
 User-facing copy lives in `res/values/strings.xml` (English) and
 `res/values-sr/strings.xml` (Serbian) — never hard-coded in a composable.
 
-### What is not built yet
+### The capture mechanism — Shizuku (owner's word, 2026-09-11)
 
-The capture mechanism itself. `CaptureRegistry` is empty on purpose: until a
-mechanism is proven to put both voices in the file on ordinary phones, the app
-says so on the setup screen rather than promising anything.
+`CaptureRegistry` now holds one entry: `ShizukuCaptureSource`. The chain is
+`CallWatcher` (notices the call) → `RecordingCoordinator` (applies the lists) →
+`ShizukuManager` → `PrivilegedRecorder` (records `VOICE_CALL` as the ADB shell) →
+`Vault` (sealed). The user pairs Shizuku once, guided by the setup screen; no
+computer, no root. Two things stay unproven until measured on a real phone:
+that `VOICE_CALL` as shell carries BOTH voices during a live call, and that the
+app re-arms itself cleanly after a reboot.
 
 ---
 

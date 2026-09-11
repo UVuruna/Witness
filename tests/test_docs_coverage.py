@@ -52,6 +52,11 @@ TRIVIAL: set[str] = {
     "app/src/main/java/com/pebblesoft/toolbox/ui/numbers/NumbersScreen.kt",
     "app/src/main/java/com/pebblesoft/toolbox/ui/settings/SettingsScreen.kt",
     "app/src/main/java/com/pebblesoft/toolbox/ui/setup/SetupScreen.kt",
+    # Capture branch (Shizuku, 2026-09-11) — Trivial: thin platform wrappers and
+    # a boot hook whose whole story is in app/___app.md.
+    "app/src/main/java/com/pebblesoft/toolbox/capture/BootReceiver.kt",
+    "app/src/main/java/com/pebblesoft/toolbox/capture/CaptureService.kt",
+    "app/src/main/java/com/pebblesoft/toolbox/capture/shizuku/ShizukuCaptureSource.kt",
 }
 
 # THE PRODUCT — Standard files: each carries a decision that outlives its code
@@ -63,6 +68,12 @@ STANDARD: set[str] = {
     "app/src/main/java/com/pebblesoft/toolbox/data/CallRecord.kt",
     "app/src/main/java/com/pebblesoft/toolbox/ui/AppViewModel.kt",
     "app/src/main/java/com/pebblesoft/toolbox/ui/AppNav.kt",
+    # The capture chain's load-bearing parts — each is where the recording can
+    # succeed or fail, and each owes the reasoning to a doc.
+    "app/src/main/java/com/pebblesoft/toolbox/capture/RecordingCoordinator.kt",
+    "app/src/main/java/com/pebblesoft/toolbox/capture/CallWatcher.kt",
+    "app/src/main/java/com/pebblesoft/toolbox/capture/shizuku/ShizukuManager.kt",
+    "app/src/main/java/com/pebblesoft/toolbox/capture/shizuku/PrivilegedRecorder.kt",
 }
 
 ALGORITHMIC: set[str] = set()

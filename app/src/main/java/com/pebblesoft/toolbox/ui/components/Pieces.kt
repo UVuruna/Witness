@@ -6,12 +6,18 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridScope
+import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -24,7 +30,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 /**
@@ -39,10 +47,10 @@ import androidx.compose.ui.unit.dp
  * A titled block of content. The title is optional — some blocks speak for
  * themselves.
  *
- * The content is capped at [READING_WIDTH] and centred. On a phone held
- * upright that cap never bites; in landscape, on a tablet or on a foldable it
- * is the whole difference between a readable column and a line of text
- * stranded at the left edge of an empty card (SPACE & LEGIBILITY).
+ * Padding only — the column count and the overall width cap are decided by
+ * [AdaptiveBody], so a section never has to know how wide the screen is.
+
+
  */
 @Composable
 fun Section(
@@ -50,28 +58,60 @@ fun Section(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
-    Box(modifier.fillMaxWidth(), contentAlignment = Alignment.TopCenter) {
-        Column(
-            Modifier
-                .widthIn(max = READING_WIDTH)
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-        ) {
-            if (title != null) {
-                Text(
-                    title,
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(start = 4.dp, bottom = 8.dp),
-                )
-            }
-            content()
+    Column(modifier.fillMaxWidth().padding(horizontal = 16.dp)) {
+        if (title != null) {
+            Text(
+                title,
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(start = 4.dp, bottom = 8.dp),
+            )
         }
+        content()
     }
 }
 
-/** As wide as a block of text may get before the eye starts to lose the line. */
-val READING_WIDTH = 560.dp
+/** Below this the phone is narrow: one column, bottom bar. Above it, two and a rail. */
+const val WIDE_DP = 600
+
+/** As wide as the whole content may get before it stops being a page and becomes a field. */
+val MAX_CONTENT = 1200.dp
+
+@Composable
+fun isWide(): Boolean = LocalConfiguration.current.screenWidthDp >= WIDE_DP
+
+/**
+ * The scrolling body every screen is built on.
+ *
+ * One column on a phone held upright, TWO on anything wider — landscape, a
+ * foldable, a tablet. This is the reflow step of SPACE & LEGIBILITY: before a
+ * screen is allowed to hide content below the fold, it must first spend the
+ * empty space beside it. The whole grid is capped at [MAX_CONTENT] and centred
+ * so that on a very wide screen it stays a page rather than a stretched field.
+ */
+@Composable
+fun AdaptiveBody(
+    modifier: Modifier = Modifier,
+    spacing: Dp = 16.dp,
+    content: LazyStaggeredGridScope.() -> Unit,
+) {
+    Box(modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
+        LazyVerticalStaggeredGrid(
+            columns = StaggeredGridCells.Fixed(if (isWide()) 2 else 1),
+            modifier = Modifier.widthIn(max = MAX_CONTENT).fillMaxSize(),
+            contentPadding = PaddingValues(vertical = 16.dp),
+            verticalItemSpacing = spacing,
+            horizontalArrangement = Arrangement.spacedBy(spacing),
+            content = content,
+        )
+    }
+}
+
+/** A grid cell that must take the whole row — a search box, a heading, a footer. */
+fun LazyStaggeredGridScope.fullWidthItem(
+    key: Any? = null,
+    content: @Composable () -> Unit,
+) = item(key = key, span = StaggeredGridItemSpan.FullLine) { content() }
 
 @Composable
 fun SoftCard(

@@ -27,6 +27,22 @@
     <string name="home_recent_empty">Još ničega nema. Prvi snimak se ovde pojavi sam.</string>
     <string name="home_open_all">Vidi sve</string>
 
+    <!-- Service -->
+    <string name="service_notification">Aktivno</string>
+
+    <!-- Shizuku setup guide -->
+    <string name="guide_shizuku_headline">Uključi čuvanje poziva</string>
+    <string name="guide_shizuku_1_title">Instaliraj pomoćnika</string>
+    <string name="guide_shizuku_1_detail">Aplikaciji treba mali besplatni pomoćnik po imenu Shizuku da bi čuvala pozive. Dodirni Otvori da ga preuzmeš, pa se vrati ovde.</string>
+    <string name="guide_shizuku_2_title">Uključi bežično otklanjanje grešaka</string>
+    <string name="guide_shizuku_2_detail">Dodirni Otvori. Ako ne vidiš „Opcije za programere", idi u Podešavanja, O telefonu i sedam puta dodirni „Broj verzije". Zatim u Opcijama za programere uključi „Bežično otklanjanje grešaka".</string>
+    <string name="guide_shizuku_3_title">Pokreni pomoćnika</string>
+    <string name="guide_shizuku_3_detail">Dodirni Otvori za Shizuku. Pritisni „Uparivanje", unesi kod koji ti pokaže, pa pritisni „Start". Pisaće „Shizuku radi".</string>
+    <string name="guide_shizuku_4_title">Dozvoli ovoj aplikaciji</string>
+    <string name="guide_shizuku_4_detail">Vrati se ovde. Kada Shizuku pita, dodirni „Dozvoli". To je poslednji korak — zaštićena si.</string>
+    <string name="guide_shizuku_keep_reboot">Ako ugasiš i upališ telefon, otvori ovu aplikaciju jednom i dodirni dugme na početnom ekranu da ponovo uključiš čuvanje. Traje par sekundi.</string>
+    <string name="home_rearm">Ponovo uključi čuvanje</string>
+
     <!-- Setup -->
     <string name="setup_title">Podesi jednom</string>
     <string name="setup_intro">Uradi ove korake jednom. Posle toga se svaki poziv čuva sam — nikada ne diraš aplikaciju dok telefon zvoni.</string>

@@ -10,8 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Block
@@ -43,7 +42,9 @@ import com.pebblesoft.toolbox.data.NumberRule
 import com.pebblesoft.toolbox.data.RuleMode
 import com.pebblesoft.toolbox.data.UnknownRule
 import com.pebblesoft.toolbox.ui.AppState
+import com.pebblesoft.toolbox.ui.components.AdaptiveBody
 import com.pebblesoft.toolbox.ui.components.Section
+import com.pebblesoft.toolbox.ui.components.fullWidthItem
 import com.pebblesoft.toolbox.ui.components.SoftCard
 
 /**
@@ -64,11 +65,7 @@ fun NumbersScreen(
 ) {
     var adding by remember { mutableStateOf<RuleMode?>(null) }
 
-    LazyColumn(
-        Modifier.fillMaxSize(),
-        contentPadding = androidx.compose.foundation.layout.PaddingValues(vertical = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(18.dp),
-    ) {
+    AdaptiveBody(spacing = 18.dp) {
         item {
             RuleList(
                 title = stringResource(R.string.numbers_whitelist),
@@ -133,7 +130,7 @@ fun NumbersScreen(
             }
         }
 
-        item { Spacer(Modifier.height(24.dp)) }
+        fullWidthItem { Spacer(Modifier.height(24.dp)) }
     }
 
     adding?.let { mode ->

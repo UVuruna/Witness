@@ -10,19 +10,14 @@ only ADD or TIGHTEN its rules — never loosen them.
 profiles: phone-portrait
 installable: yes
 
-<!-- installable: release = signed AAB uploaded to the Play Console, on the
-     owner's word only (BUILD.md applies). There is no NSIS installer. -->
-
 ## Stack
 
 - Language / runtime: Kotlin, native Android (min SDK 29, target = current
   Play requirement)
 - GUI: Jetpack Compose
-- Key libraries: whisper.cpp via JNI (on-device STT), Picovoice Porcupine
-  (on-device custom wake phrase, SOS trigger), Jetpack Security
-  (EncryptedFile / EncryptedSharedPreferences — the vault)
-- Data / storage: app-private encrypted files + Room index; nothing in shared
-  storage, nothing in the gallery
+- Key libraries: Shizuku (ADB-privileged capture), whisper.cpp via JNI
+  (on-device STT), Picovoice Porcupine (SOS wake phrase), Jetpack Security
+- Data / storage: app-private encrypted files + Room index; nothing shared
 
 **Why native Kotlin** (Step-3 justification, START.md): the product IS the
 platform's telephony surface — call detection, foreground services with
@@ -57,49 +52,40 @@ python tests/run_guards.py --fast  guards, fast (PostToolUse hook)
 
 ## Project laws
 
-- **PRIVACY IS A LAW, NOT A FEATURE.** No audio, transcript, or metadata ever
-  leaves the device except through a channel the user explicitly enabled
-  (backup, SOS message). No analytics, no telemetry, no crash reporting that
-  carries content. Ever.
-- **THE INSPECTION TEST.** Every feature must survive "the abuser takes the
-  phone and looks through it": nothing in the gallery, file manager, share
-  sheets, notification history, or recent-apps screen may reveal what this
-  app holds.
-- **A RECORDING WITHOUT BOTH VOICES IS NOT A RESULT** (owner decree
-  2026-09-11): nothing may be delivered — no plan, no table, no feature, no
-  report — whose answer to "is the other party in the recording?" is no. A file
-  holding one side of a conversation proves nothing and protects nobody, so it
-  is not a smaller version of the product; it is not the product. Enforced by
-  `tests/hook_no_half_recording.py` (Stop hook, registered in
-  `.claude/settings.json`) and pinned by `tests/test_half_recording_hook.py`.
-- **EVERY PHONE, OR IT DOES NOT COUNT** (owner decree 2026-09-11): a mechanism
-  that works on one manufacturer's phones is not a mechanism. The built-in
-  recorder in Samsung's or Xiaomi's own dialer is the standing example — it is
-  DEAD for this project and is never to be raised again, whatever a given
-  handset can do. A candidate must work across manufacturers or it does not
-  enter the list.
-- **EVERY OPTION ARRIVES WHOLE** (owner decree 2026-09-11): an idea is never
-  presented before its full price is known. Naming one means naming, in the same
-  breath: what we must build, what the owner must provide, every step the user
-  must take, everything that must be true but is not yet proven, what it costs,
-  and which phones it covers. An option offered without that list is a guess
-  wearing a solution's clothes, and four of them in one day is what this rule
-  exists to prevent.
-- **ONLY STEPS AN ORDINARY USER CAN DO** (owner decree 2026-09-11): a solution
-  may never require developer options, wireless debugging, ADB, Shizuku, root,
-  a firmware/CSC change, or any hidden setting — nor anything that must be
-  re-armed after a reboot. The users are people under threat, often with the
-  abuser nearby; a path they cannot walk is not a path. This rules out every
-  privileged-capture route, whatever its technical merit.
-- **OFFICIAL APIS ONLY** (owner decree 2026-09-01): no Accessibility-API
-  recording, no root paths, no reflection into blocked audio sources. If Play
-  policy forbids it, this project does not do it — the users cannot afford to
-  lose the app to a takedown.
-- **THE SOS IS FULLY AUTOMATIC** (owner decree 2026-09-01): once the danger
-  phrase is recognized, no tap, no confirmation, no unlock may stand between
-  recognition and the outgoing alert — by the time the phrase is spoken, the
-  user's hands may not be free. A short audible-free cancel window is the only
-  permitted gate.
+Owner decrees, newest first. Each is WHAT · WHO CHECKS.
+
+- **A RECORDING WITHOUT BOTH VOICES IS NOT A RESULT** (2026-09-11). Nothing may
+  be delivered — plan, table, feature or report — whose answer to "is the other
+  party in the recording?" is no. · `tests/hook_no_half_recording.py` (Stop
+  hook), pinned by `tests/test_half_recording_hook.py`.
+- **EVERY PHONE, OR IT DOES NOT COUNT** (2026-09-11). A mechanism confined to
+  one manufacturer is not a mechanism. The built-in dialer recorder is DEAD and
+  is never raised again. · review.
+- **EVERY OPTION ARRIVES WHOLE** (2026-09-11). Never name an idea without, in
+  the same breath: what we build · what the owner provides · every step the user
+  takes · what is still unproven · what it costs · which phones it covers. ·
+  review.
+- **ONE SETUP, GUIDED, THEN NOTHING** (2026-09-11, replaces the stricter
+  2026-09-11 morning rule). The user may be asked for ONE setup she performs on
+  her own phone, with the app leading her step by step and no computer involved
+  — Shizuku's wireless-debugging pairing is the approved case. Everything after
+  it must be automatic, including after a reboot; where auto-restart fails, the
+  app offers one button, never a procedure. Still forbidden: root, a
+  firmware/CSC change, anything needing a PC. · review.
+- **PRIVACY IS A LAW, NOT A FEATURE.** No audio, transcript or metadata leaves
+  the device except through a channel the user explicitly enabled. No analytics,
+  no telemetry, no crash reporting carrying content. · review.
+- **THE INSPECTION TEST.** Every feature survives "the abuser takes the phone
+  and looks through it": nothing in the gallery, file manager, share sheet,
+  notification history or recents reveals what the app holds. · review.
+- **DISTRIBUTION IS GITHUB, NOT PLAY** (2026-09-11). The capture mechanism
+  cannot pass Play review, and the owner chose the mechanism. The app ships as a
+  signed APK from GitHub Releases and checks there for updates. A Play build, if
+  it ever exists, is a separate flavour without capture. · review.
+- **THE SOS IS FULLY AUTOMATIC** (2026-09-01). Once the danger phrase is
+  recognized, no tap, no confirmation and no unlock stands between recognition
+  and the outgoing alert. A short silent cancel window is the only gate. ·
+  review.
 - RATCHET (files allowed over the structure wall, shrinking only): none.
 
 ## Docs
@@ -111,10 +97,9 @@ python tests/run_guards.py --fast  guards, fast (PostToolUse hook)
 
 ## Open items
 
-- **The capture mechanism.** `CaptureRegistry` ships empty: no way of obtaining
-  a recording has yet been proven to satisfy BOTH new laws at once — both voices
-  in the file, and a setup an ordinary user can complete. Until one is, the app
-  says so on its setup screen. This is the project's single blocking question.
+- **Capture is Shizuku** (owner's word, 2026-09-11). Two things stay unproven
+  until measured: that the privileged channel carries both voices during a LIVE
+  call, and that the app can re-arm itself after a reboot.
 - **Folder rename** `Safety` → `Witness` ([RENAME.md](RENAME.md)) — still not
   executed; the tool refuses to run from inside the folder.
 - **applicationId** is `com.pebblesoft.toolbox` (neutral, as RENAME.md requires).

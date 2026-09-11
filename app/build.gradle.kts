@@ -15,8 +15,8 @@ android {
         applicationId = "com.pebblesoft.toolbox"
         minSdk = 29
         targetSdk = 35
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = 2
+        versionName = "0.2.0"
     }
 
     buildTypes {
@@ -37,6 +37,7 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+        aidl = true
     }
 
     packaging {
@@ -69,4 +70,9 @@ dependencies {
 
     // The lock on the door.
     implementation("androidx.biometric:biometric:1.1.0")
+
+    // Shizuku: borrow ADB-shell privilege so the recorder can open the call's
+    // own audio, with no root and no PC (CLAUDE.md → capture is Shizuku).
+    implementation("dev.rikka.shizuku:api:13.1.5")
+    implementation("dev.rikka.shizuku:provider:13.1.5")
 }

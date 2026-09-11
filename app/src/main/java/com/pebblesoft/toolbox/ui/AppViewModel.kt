@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.pebblesoft.toolbox.app
 import com.pebblesoft.toolbox.capture.CaptureRegistry
+import com.pebblesoft.toolbox.capture.CaptureService
 import com.pebblesoft.toolbox.capture.CaptureSource
 import com.pebblesoft.toolbox.data.CallRecord
 import com.pebblesoft.toolbox.data.DefaultRule
@@ -96,6 +97,17 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
             record.transcriptFile?.let(container.vault::delete)
             records.delete(record)
         }
+    }
+
+    /**
+     * Re-arm capture: ask Shizuku for the privilege (or open its grant dialog)
+     * and make sure the always-on ear is running. This is the one button the
+     * home screen offers after a reboot, and the last tap of first setup.
+     */
+    fun rearm() {
+        container.shizuku.requestPermission()
+        container.shizuku.bindRecorder()
+        CaptureService.ensureRunning(getApplication())
     }
 
     /** Drop every decrypted copy the moment the screen showing it goes away. */
