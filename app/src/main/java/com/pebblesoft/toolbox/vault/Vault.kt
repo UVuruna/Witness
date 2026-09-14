@@ -76,6 +76,16 @@ class Vault(private val context: Context) {
     fun verify(name: String, seal: Seal): Boolean = Seal.over(File(dir, name)).sha256 == seal.sha256
 
     /**
+     * The same check against the hash stored on the record's own row — which is
+     * the form the evidence actually travels in, and therefore the one a screen
+     * showing a recording can perform without re-deriving anything.
+     */
+    fun matchesSeal(name: String, sha256: String): Boolean {
+        if (sha256.isEmpty() || !exists(name)) return false
+        return Seal.over(File(dir, name)).sha256 == sha256
+    }
+
+    /**
      * Put a readable copy in the scratch area — the only way to hand the bytes
      * to a media player or a share sheet, and always a COPY, never the vault
      * file itself. Call [purgeScratch] the moment it is no longer on screen.

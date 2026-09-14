@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.CallMade
 import androidx.compose.material.icons.automirrored.filled.CallReceived
+import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.GraphicEq
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
@@ -137,8 +138,11 @@ fun RecordingRow(record: CallRecord, onClick: () -> Unit) {
     SoftCard(Modifier.clickable(onClick = onClick)) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             Icon(
-                if (record.direction == Direction.INCOMING) Icons.AutoMirrored.Filled.CallReceived
-                else Icons.AutoMirrored.Filled.CallMade,
+                when (record.direction) {
+                    Direction.INCOMING -> Icons.AutoMirrored.Filled.CallReceived
+                    Direction.OUTGOING -> Icons.AutoMirrored.Filled.CallMade
+                    Direction.UNKNOWN -> Icons.Filled.Call
+                },
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
             )
@@ -164,6 +168,14 @@ fun RecordingRow(record: CallRecord, onClick: () -> Unit) {
     }
 }
 
+/**
+ * The verdict, in the same place on every row.
+ *
+ * Only [Quality.BOTH_VOICES] gets the calm colour. Everything else is a warning
+ * colour on purpose: a file holding one person is not a slightly worse recording,
+ * it is not evidence, and nobody must ever carry one to a lawyer believing
+ * otherwise.
+ */
 @Composable
 private fun QualityPill(quality: Quality) {
     val scheme = MaterialTheme.colorScheme
@@ -171,11 +183,17 @@ private fun QualityPill(quality: Quality) {
         Quality.BOTH_VOICES -> Pill(
             stringResource(R.string.rec_quality_evidence), scheme.onPrimaryContainer, scheme.primaryContainer
         )
+        Quality.ONE_VOICE -> Pill(
+            stringResource(R.string.rec_quality_one_voice), scheme.onErrorContainer, scheme.errorContainer
+        )
         Quality.UNVERIFIED -> Pill(
             stringResource(R.string.rec_quality_unverified), scheme.onSurfaceVariant, scheme.surfaceVariant
         )
         Quality.FAILED -> Pill(
             stringResource(R.string.rec_quality_failed), scheme.onErrorContainer, scheme.errorContainer
+        )
+        Quality.NOT_CAPTURED -> Pill(
+            stringResource(R.string.rec_quality_not_captured), scheme.onErrorContainer, scheme.errorContainer
         )
     }
 }

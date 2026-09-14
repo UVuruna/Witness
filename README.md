@@ -9,14 +9,17 @@ Android app that protects victims of violence: it records their phone calls, tur
 A victim of domestic violence or abuse needs three things their phone can give
 them: **proof** of what was said to them, **protection** of that proof from the
 abuser who may inspect or destroy the phone, and a **lifeline** for the moment
-things turn dangerous. Safety is those three things in one app, built strictly
-on what Google Play officially allows — no root, no tricks, nothing that a
-policy change can take away from the people who depend on it.
+things turn dangerous. Safety is those three things in one app — no root, no
+firmware change, no computer, and nothing the user has to remember to do while
+the phone is ringing.
 
 ## What it does
 
 - **Records calls** automatically (all numbers, or filtered by the user's own
-  record/skip lists) as a single audio file per call.
+  record/skip lists) as a single audio file per call, by whichever of two routes
+  this particular phone can actually deliver both people through: quietly, from
+  the call's own audio via Shizuku, or out loud through the speaker — a choice
+  the app MEASURES with a twenty-second test call rather than promising.
 - **Transcribes on the device** — no internet needed — and labels the timeline
   by speaker: `[mm:ss] WHO: what was said`.
 - **Guards the evidence**: encrypted storage, hash + timestamp per recording so
@@ -35,12 +38,22 @@ module map and technology decisions in [ARCHITECTURE](docs/ARCHITECTURE.md).
 
 ## Status
 
-Founded 2026-09-01. The owner has picked the final name — **Witness** — and
-the pending folder rename is fully specified in [RENAME](RENAME.md) (this
-session could not run it while live inside the folder). Milestone M0 — a throwaway feasibility probe of
-microphone capture during a speakerphone call on real devices — is the next
-step; no product code exists yet. Distribution target: Google Play
-(official-APIs-only is a project law, see [CLAUDE.md](CLAUDE.md)).
+Founded 2026-09-01. The owner has picked the final name — **Witness** — and the
+pending folder rename is fully specified in [RENAME](RENAME.md) (this session
+could not run it while live inside the folder).
+
+The product exists and builds. The capture chain records, measures what it
+recorded, and labels it honestly; the number lists, the encrypted vault and its
+seal, and the whole interface in English and Serbian are in place. **Not yet
+built:** the PIN and fingerprint gate, the disguised name and icon, the single
+recording screen (player, share, delete, seal check) and the speaker-labeled
+transcript.
+
+One thing is still unmeasured on a real handset: whether the app re-arms itself
+cleanly after a reboot.
+
+Distribution is a signed APK from GitHub Releases — the capture mechanism cannot
+pass Play review, and the owner chose the mechanism (see [CLAUDE.md](CLAUDE.md)).
 
 ## Project layout
 
@@ -49,13 +62,13 @@ step; no product code exists yet. Distribution target: Google Play
   📝 README.md          ← you are here
   📝 CLAUDE.md          ← project rules: stack, laws, how to run/test
   📁 docs/              ← PLAN, FEATURES, ARCHITECTURE
-  📁 app/               ← M0 call-audio probe (throwaway) — see app/___app.md
+  📁 app/               ← the Android app — see app/___app.md
   📁 assets/            ← logo
   📁 tests/             ← guard tests (structure, config, docs, links)
   📁 UV/                ← owner's inbox (untracked)
 ```
 
-The M0 feasibility probe — a throwaway app that measures what the microphone
-actually captures during a call — is documented in [app/___app.md](app/___app.md).
+The app — its modules, the two capture routes and the throwaway M0 probe that
+still sits beside them — is documented in [app/___app.md](app/___app.md).
 
 Guard tests are documented in [tests](tests/___tests.md).

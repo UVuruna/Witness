@@ -1,82 +1,109 @@
 # Plan
 
-Milestones, the MVP scenario matrix, and the Play-policy risk register.
+Milestones, the scenario matrix, and the risk register.
 
 Navigation: [README](../README.md) · [FEATURES](FEATURES.md) · [ARCHITECTURE](ARCHITECTURE.md)
 
 ---
 
-## Decisions locked (owner, 2026-09-01)
+## Decisions locked
 
-1. **One recording + software diarization**, not two audio channels. Android
-   gives no app access to the call's own audio streams; the microphone during
-   a speakerphone call captures both voices mixed, and speaker separation
-   happens in the transcript, not in the file.
-2. **Android only, Google Play only, official APIs only.** The owner has a
-   Play developer account; the project ships nothing Play policy forbids.
-   iOS later at most as an import-and-analyze companion (Apple's native
-   recorder makes the file; our app would vault and transcribe it).
-3. **The SOS is fully automatic.** Recognized danger phrase → location goes to
-   the trusted contact(s) with no user interaction. A confirmation tap was
-   considered and REJECTED by the owner: if the phrase was spoken, the abuser
-   may already control the user's hands. Trusted contacts: one or more, the
-   user's choice.
-4. **Protection ranks equal to recording** — hidden identity, PIN, encryption
-   and off-phone backup are core, not polish (the abuser often has access to
-   the victim's phone).
+Newest first; each supersedes what it contradicts.
 
-## Feasibility & duplication (START.md gate)
+1. **Two voices means two PEOPLE, by any route** (owner, 2026-09-14). Whether
+   the two are captured from one privileged source or through the microphone
+   with the speaker on does not matter. What matters is who ends up in the file,
+   and that the app never says "both" without having measured it.
+2. **Coverage is measured, never promised** (2026-09-14). Whether the far party
+   reaches the recording is decided below the app by the manufacturer's audio
+   driver. A twenty-second guided test call answers it per phone and per route;
+   until it has, the app does not claim to be protecting anyone.
+3. **One system setting may be asked for** (owner, 2026-09-14), and only as the
+   cure for a MEASURED failure, with the app walking her through it. Turning
+   Wi-Fi calling off is the named case: on many phones it is the single
+   difference between a recording and silence.
+4. **Distribution is GitHub, not Play** (owner, 2026-09-11). The capture
+   mechanism cannot pass Play review and the owner chose the mechanism. The app
+   ships as a signed APK from GitHub Releases and checks there for updates. This
+   replaces the 2026-09-01 decision to build strictly inside Play policy.
+5. **Capture is Shizuku** (owner, 2026-09-11), with one guided pairing the user
+   performs on her own phone — no computer, no root. This replaces the
+   2026-09-01 decision to use the microphone only; the loudspeaker route
+   survives as the fallback that works everywhere.
+6. **The SOS is fully automatic** (2026-09-01). Recognized danger phrase →
+   location goes to the trusted contacts with no user interaction. A confirmation
+   tap was considered and REJECTED: if the phrase was spoken, the abuser may
+   already control the user's hands.
+7. **Protection ranks equal to recording** (2026-09-01) — hidden identity, PIN,
+   encryption and off-phone backup are core, not polish.
 
-- **Duplication:** nothing equivalent in the monorepo (this is its first
-  mobile safety app). Outside: personal-safety apps exist (panic buttons,
-  location sharing) and call recorders exist, but no Play-compliant app
-  combines automatic recording + on-device speaker-labeled transcripts +
-  tamper-evident vault + voice-triggered SOS for this audience. The
-  combination is the product.
-- **The hard part, named:** Android deliberately blocks third-party access to
-  call audio. Our path — microphone capture (speakerphone where needed) with
-  software diarization — is officially allowed but device-dependent: some
-  OEMs mute the microphone for other apps during a call. Therefore **M0 is a
-  throwaway feasibility probe, not a scaffold**: prove on real devices what
-  the microphone actually hears during a call, per device profile.
+## The hard part, named
+
+Android deliberately blocks third-party access to call audio. Both routes out of
+that are partial, and the product's honesty rests on admitting which:
+
+- **Shizuku / `VOICE_CALL` as shell.** The privilege is real — the ADB shell uid
+  holds `CAPTURE_AUDIO_OUTPUT`. What the buffer then contains is decided by the
+  OEM audio HAL: both voices on recent stock Pixels, usually the user alone on
+  Samsung since the S9, anything from mixed channels to silence elsewhere, and
+  commonly silence over Wi-Fi calling. A further trap: some devices expose
+  uplink and downlink as the two channels of one stereo stream, so a mono
+  request silently discards one person.
+- **Loudspeaker + microphone.** Physically unstoppable and therefore the only
+  mechanism that satisfies EVERY PHONE, OR IT DOES NOT COUNT — at the cost of
+  being audible to whoever is in the room.
+
+A conference bridge (`ROLE_DIALER` + carrier three-way into a SIP bridge) was
+considered and rejected: merge is an unprovisioned supplementary service on much
+prepaid and in roaming, and it leaves a second call to the recording number on
+the itemized bill, which an abuser reviewing the account can see. That breaks
+THE INSPECTION TEST at a layer no app code reaches.
 
 ## Milestones
 
-| # | Milestone | Delivers | Feature slugs |
-|---|-----------|----------|---------------|
-| M0 | **Feasibility probe** (throwaway) | Measured answer per test device: what does mic capture yield during a call — both voices / own voice only / silence? With and without speakerphone. | `call-recording` |
-| M1 | **Record + protect** | Call-triggered recording service, encrypted vault, hash+timestamp seal, PIN lock, neutral identity. | `call-recording` `vault` `disguise` |
-| M2 | **Understand** | On-device whisper.cpp transcription + diarization → timestamped speaker timeline. | `transcript` |
-| M3 | **Lists + Play release** | Record/skip lists, restricted-permission declarations, store listing, closed testing → production. | `record-lists` |
-| M4 | **SOS** | Danger-phrase training + on-device recognition, automatic location message to trusted contacts, cancel window. | `sos` |
-| M5 | **Backup** | User-connected cloud copy of the vault. | `backup` |
+| # | Milestone | Delivers | Feature slugs | State |
+|---|-----------|----------|---------------|-------|
+| M0 | **Feasibility probe** (throwaway) | What each audio source yields on a real device. | `call-recording` | done, superseded |
+| M1 | **Record + protect** | Call-triggered recording service, encrypted vault, hash+timestamp seal. | `call-recording` `vault` | vault + seal done |
+| M2 | **Measured capture** | Permissions actually requested, the service that survives Android 14, stereo-first recording with a source ladder, per-channel measurement, the guided test call, honest quality labels, number and direction on Android 12+, the loudspeaker route, VoIP detection. | `call-recording` `voip` `record-lists` | **done 2026-09-14** |
+| M3 | **The door** | PIN and fingerprint gate, the disguised name and icon, the single-recording screen with player, seal check, share and delete. | `disguise` `vault` | next |
+| M4 | **Understand** | On-device whisper.cpp transcription; exact speaker labels where the device gave two channels. | `transcript` | planned |
+| M5 | **Release** | Signing config, signed APK, GitHub Release, in-app update check. | — | blocked on the owner |
+| M6 | **SOS** | Danger-phrase training, on-device recognition, automatic location message, cancel window. | `sos` | planned |
+| M7 | **Backup** | User-connected cloud copy of the vault. | `backup` | planned |
 
-## Scenario matrix (MVP = M0–M3)
+## Scenario matrix
 
 | # | Scenario | Expected behaviour |
 |---|----------|---------------------|
 | 1 | Incoming call from a number on the record list | Recording starts by itself, no visible sign |
-| 2 | Call from a number on the skip list | Nothing recorded, nothing logged |
-| 3 | Number unavailable (permission denied) | Default rule applies (record everything) |
-| 4 | Call ends, phone has no internet | Transcript is still produced (on-device STT) |
-| 5 | Abuser takes the phone and inspects it | Neutral icon, PIN, nothing in gallery/files/recents |
-| 6 | Phone destroyed or confiscated | Off-phone copy of the vault exists (if user enabled it) |
-| 7 | Recording offered as evidence | Hash + timestamp prove the file was never altered |
-| 8 | Battery dies / reboot mid-call | Partial recording up to that point is sealed and kept |
-| 9 | OEM mutes the mic during calls | App detects it and tells the user honestly, never records silence in secret |
-| 10 | Danger phrase spoken mid-call (M4) | Location message leaves silently to all trusted contacts; short cancel window |
+| 2 | Call from a number on the skip list | Nothing recorded, nothing logged — and the check is repeated at call end, when the number is actually known |
+| 3 | Number unavailable (withheld or permission denied) | Default rule applies; the row says `UNKNOWN` rather than inventing a direction |
+| 4 | The phone splits the call into two channels | Both are recorded, compared, and the row reads "both voices" on evidence |
+| 5 | The phone yields one voice only | The row says so, the home screen says so, and the loudspeaker route is offered |
+| 6 | Nothing is permitted yet | The app asks, in one numbered list, and never pretends to be armed |
+| 7 | Call inside WhatsApp / Viber / Messenger | Recorded when the loudspeaker route is on; otherwise a visible "not saved" row |
+| 8 | Abuser takes the phone and inspects it | Neutral icon, PIN, nothing in gallery/files/recents *(M3)* |
+| 9 | Recording offered as evidence | Hash + timestamp prove the file was never altered |
+| 10 | Battery dies / reboot mid-call | Partial recording up to that point is sealed and kept |
+| 11 | Reboot, then a call before the app is opened | **Unmeasured.** Shizuku must be restarted; the app must recover with one tap |
+| 12 | Danger phrase spoken mid-call *(M6)* | Location message leaves silently; short cancel window |
 
-## Play-policy risk register
+## Risk register
 
 | Risk | Reality | Strategy | Fallback |
 |------|---------|----------|----------|
-| Recording the call itself | No app may touch the call audio stream; Accessibility-API recording is banned outright. | Microphone capture only, speakerphone where the device requires it; prominent-disclosure consent flow at onboarding. | If a device yields nothing usable, the app says so per scenario 9 — never a silent broken promise. |
-| Caller number for lists | `READ_CALL_LOG` / `READ_PHONE_STATE` are restricted permissions needing a Play declaration. | Submit the declaration (safety use case). | Lists degrade gracefully: record-everything default works with no number access (scenario 3). |
-| Automatic SOS message | `SEND_SMS` is a restricted permission; declaration approval is not guaranteed. | Submit the declaration (emergency use case). | **Internet relay, still fully automatic**: the alert goes over the network to an SMS gateway or to the contact's own app — no restricted permission, no user tap. The automatic promise survives either way. |
-| Disguised identity | Play bans impersonation and misleading store listings. | The STORE listing is honest; the on-device name/icon choice is the user's own setting (established pattern in shipped victim-safety apps). | Ship a small set of neutral looks vetted against policy; the store identity never changes. |
-| Background microphone | Foreground service with `microphone` type + visible notification is mandatory. | Use exactly that; the notification wears the neutral identity. | — |
+| The quiet route yields one voice | Decided by the OEM audio HAL; unknowable from code | Measure it with the guided test call, per phone, and label every recording from what was measured | The loudspeaker route, which captures both people anywhere |
+| Wi-Fi calling records as silence | Common, and the app cannot change the setting itself | Offer the exact settings screen after a failed test — the one system setting the owner allowed asking for | The loudspeaker route |
+| Shizuku does not survive a reboot | Android's limit, not ours | The boot receiver restarts the ear; the home screen offers one button to re-arm | **Unproven — scenario 11** |
+| Calls in other apps | No modem audio to tap; the call-state signal never fires | Detect through the audio mode and record on the loudspeaker | An honest "not saved" row |
+| Distribution outside Play | No store review, no automatic updates | Signed APK from GitHub Releases, in-app update check | — |
+| A user believes she is covered when she is not | The most dangerous failure this product has | Status is `READY` only after a measurement; every other state names itself and gives one action | — |
 
 ## Open
 
-- Final project name — owner picks from proposed candidates.
-- M0 device list — which physical devices the probe runs on.
+- **Signing and release** — `app/build.gradle.kts` has no `signingConfig` and no
+  keystore exists, so `assembleRelease` produces an unsigned APK. Creating the
+  key and cutting the Release both need the owner.
+- **Folder rename** `Safety` → `Witness` ([RENAME](../RENAME.md)).
+- Scenario 11 (re-arm after reboot) needs one measurement on a real phone.

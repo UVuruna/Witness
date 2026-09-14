@@ -9,6 +9,11 @@ a report or a built feature — wastes the one thing the user came for. So this
 hook reads the assistant's final message of the turn and REFUSES to let the
 turn end while that claim is being handed over as an outcome.
 
+Clarified 2026-09-14: "both voices" means two different PEOPLE, not one audio
+path. Capturing the caller through the microphone with the speaker on satisfies
+the decree exactly as a privileged call-audio tap would — the question this
+hook asks is only ever whether the other person ends up in the file.
+
 Discussing WHY a path fails is allowed only when the same message also carries
 a path that does capture both sides (the escape marker below). A message that
 only explains the failure is exactly what the decree forbids.
@@ -108,9 +113,10 @@ def main() -> int:
         + "\n  - ".join(hits)
         + "\n\nA recording with only the user's own voice is not evidence, and the owner "
         "has forbidden delivering it. Rewrite the message so it delivers a path that "
-        "captures BOTH sides (the call carried by the app itself is one), and mark that "
-        "message with the literal marker '" + ESCAPE + "' to confirm such a path is in it. "
-        "Do not weaken the claim to get past this hook — deliver the working path.",
+        "captures BOTH sides — the speakerphone route counts, since the decree is about "
+        "both PEOPLE being in the file, not about which audio path put them there — and "
+        "mark that message with the literal marker '" + ESCAPE + "' to confirm such a "
+        "path is in it. Do not weaken the claim to get past this hook — deliver the path.",
         file=sys.stderr,
     )
     return 2

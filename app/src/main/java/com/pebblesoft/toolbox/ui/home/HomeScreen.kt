@@ -42,46 +42,63 @@ import com.pebblesoft.toolbox.ui.recordings.RecordingRow
  * It answers one question in one glance — "is my phone protecting me right
  * now?" — and gives exactly one action when the answer is no. Everything else
  * on this screen is reassurance, not work.
+ *
+ * The answer has four shapes, not two, because "set up" and "proven to work" are
+ * different facts and only the second one is protection. A phone that finished
+ * the setup but was never tested says so; a phone the test caught recording her
+ * alone says THAT, and points at the route that captures both people. Saying
+ * "Recording is on" in either of those cases would be the most dangerous
+ * sentence the app could show.
  */
 @Composable
 fun HomeScreen(
     state: AppState,
     onOpenSetup: () -> Unit,
+    onOpenTest: () -> Unit,
+    onOpenSettings: () -> Unit,
     onOpenRecordings: () -> Unit,
     onOpenRecord: (Long) -> Unit,
 ) {
-    val ready = state.captureStatus == CaptureSource.Status.READY
-
     AdaptiveBody(spacing = 22.dp) {
         fullWidthItem {
             Section {
-                if (ready) {
-                    StatusCard(
+                when (state.captureStatus) {
+                    CaptureSource.Status.READY -> StatusCard(
                         icon = Icons.Filled.CheckCircle,
                         headline = stringResource(R.string.home_state_ready),
-                        detail = stringResource(R.string.home_state_ready_detail),
+                        detail = state.serviceProblem.ifEmpty {
+                            stringResource(R.string.home_state_ready_detail)
+                        },
                         accent = MaterialTheme.colorScheme.primaryContainer,
                         onAccent = MaterialTheme.colorScheme.onPrimaryContainer,
                     )
-                } else {
-                    StatusCard(
-                        icon = Icons.Filled.ErrorOutline,
-                        headline = stringResource(R.string.home_state_setup),
-                        detail = stringResource(R.string.home_state_setup_detail),
-                        accent = MaterialTheme.colorScheme.tertiaryContainer,
-                        onAccent = MaterialTheme.colorScheme.onTertiaryContainer,
-                    ) {
-                        Button(
-                            onClick = onOpenSetup,
-                            modifier = Modifier.heightIn(min = 48.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                                contentColor = MaterialTheme.colorScheme.tertiaryContainer,
-                            ),
-                        ) {
-                            Text(stringResource(R.string.home_setup_button))
-                        }
-                    }
+
+                    CaptureSource.Status.NEEDS_TEST -> ActionCard(
+                        headline = stringResource(R.string.home_state_test),
+                        detail = stringResource(R.string.home_state_test_detail),
+                        button = stringResource(R.string.home_test_button),
+                        onClick = onOpenTest,
+                    )
+
+                    CaptureSource.Status.PROVEN_HALF -> ActionCard(
+                        headline = stringResource(R.string.home_state_half),
+                        detail = stringResource(R.string.home_state_half_detail),
+                        button = stringResource(R.string.nav_settings),
+                        onClick = onOpenSettings,
+                    )
+
+                    else -> ActionCard(
+                        headline = if (state.serviceProblem.isEmpty()) {
+                            stringResource(R.string.home_state_setup)
+                        } else {
+                            stringResource(R.string.home_state_problem)
+                        },
+                        detail = state.serviceProblem.ifEmpty {
+                            stringResource(R.string.home_state_setup_detail)
+                        },
+                        button = stringResource(R.string.home_setup_button),
+                        onClick = onOpenSetup,
+                    )
                 }
             }
         }
@@ -151,5 +168,37 @@ fun HomeScreen(
         }
 
         fullWidthItem { Spacer(Modifier.height(24.dp)) }
+    }
+}
+
+/**
+ * The card the screen shows when the answer is "not yet", with the single tap
+ * that changes it. One card shape for every unprotected state, so the user
+ * learns one thing to look for instead of four.
+ */
+@Composable
+private fun ActionCard(
+    headline: String,
+    detail: String,
+    button: String,
+    onClick: () -> Unit,
+) {
+    StatusCard(
+        icon = Icons.Filled.ErrorOutline,
+        headline = headline,
+        detail = detail,
+        accent = MaterialTheme.colorScheme.tertiaryContainer,
+        onAccent = MaterialTheme.colorScheme.onTertiaryContainer,
+    ) {
+        Button(
+            onClick = onClick,
+            modifier = Modifier.heightIn(min = 48.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                contentColor = MaterialTheme.colorScheme.tertiaryContainer,
+            ),
+        ) {
+            Text(button)
+        }
     }
 }

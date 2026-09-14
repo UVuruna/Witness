@@ -17,13 +17,14 @@ setup exactly once.
 
 Two project laws shape almost every file here:
 
-- **A RECORDING WITHOUT BOTH VOICES IS NOT A RESULT** — `capture.CaptureRegistry`
-  physically refuses to register a source that cannot deliver both voices, and
-  `data.Quality` rides along with every recording so no screen can quietly show
-  a half file as evidence.
-- **ONLY STEPS AN ORDINARY USER CAN DO** — every setup instruction is a numbered
-  `capture.Step` with, wherever possible, the intent that opens the exact screen
-  it talks about.
+- **A RECORDING WITHOUT BOTH VOICES IS NOT A RESULT**, clarified 2026-09-14 as
+  TWO VOICES MEANS TWO PEOPLE, BY ANY ROUTE — `capture.VoiceCheck` is the only
+  thing allowed to decide whether a file holds two people, it decides from a
+  measurement rather than from loudness, and `data.Quality` rides along with
+  every recording so no screen can quietly show a half file as evidence.
+- **ONE SETUP, GUIDED, THEN NOTHING** — every setup instruction, permission
+  requests included, is a numbered `capture.Step` with, wherever possible, the
+  intent that opens the exact screen it talks about.
 
 ### Files
 
@@ -38,37 +39,69 @@ Two project laws shape almost every file here:
 | `data/Prefs.kt` | The user's settings, declared whole in one place. | Trivial |
 | `rules/RecordingPolicy.kt` | THE decision: is this call recorded, and why. | [Standard](__about/RecordingPolicy.md) |
 | `vault/Vault.kt` | Encrypted storage, the seal, and the only door to the bytes. | [Standard](__about/Vault.md) |
+| `permissions/RuntimePermissions.kt` | What the app must be GIVEN, and the sentence that explains each. | [Standard](__about/RuntimePermissions.md) |
 | `capture/CaptureSource.kt` | The boundary every recording mechanism plugs into. | [Standard](__about/CaptureSource.md) |
-| `capture/RecordingCoordinator.kt` | Decide → record → seal → file; one call in, one row out. | [Standard](__about/RecordingCoordinator.md) |
-| `capture/CallWatcher.kt` | The eyes: call start/end, and the caller's number. | [Standard](__about/CallWatcher.md) |
-| `capture/CaptureService.kt` | Foreground service (`microphone`) that keeps the watcher alive. | Trivial |
+| `capture/RecordingCoordinator.kt` | Decide → record → judge → seal → file; one call in, one row out. | [Standard](__about/RecordingCoordinator.md) |
+| `capture/CallWatcher.kt` | The eyes: a carrier call starts and ends. | [Standard](__about/CallWatcher.md) |
+| `capture/VoipWatcher.kt` | The other eyes: a call inside WhatsApp, Viber or Messenger. | [Standard](__about/VoipWatcher.md) |
+| `capture/CallIdentity.kt` | Who was on the other end, and who called whom. | [Standard](__about/CallIdentity.md) |
+| `capture/PcmRecorder.kt` | The one recording engine, stereo first, source ladder. | [Standard](__about/PcmRecorder.md) |
+| `capture/ChannelMeter.kt` | Measures the stream as it is written — per channel and over time. | [Standard](__about/ChannelMeter.md) |
+| `capture/VoiceCheck.kt` | THE verdict: is the other person in this file. | [Algorithmic](__about/VoiceCheck.md) |
+| `capture/RouteMemory.kt` | What this phone PROVED about each route, and what she switched on. | [Standard](__about/RouteMemory.md) |
+| `capture/MicRecorder.kt` | Speaker on, microphone recording — the route that always works. | [Standard](__about/MicRecorder.md) |
+| `capture/SpeakerphoneCaptureSource.kt` | That route described, in two variants: calls and other apps. | [Standard](__about/SpeakerphoneCaptureSource.md) |
+| `capture/CaptureOutcome.kt` | What one recording contained, and its wire form across AIDL. | Trivial |
+| `capture/WavWriter.kt` | 16-bit PCM into a WAV container, header patched on close. | Trivial |
+| `capture/CaptureService.kt` | Foreground service (`microphone`) that keeps both watchers alive. | [Standard](__about/CaptureService.md) |
 | `capture/BootReceiver.kt` | Restarts the watcher after a reboot. | Trivial |
 | `capture/shizuku/IRecorderService.aidl` | The AIDL contract to the privileged process. | Trivial |
-| `capture/shizuku/PrivilegedRecorder.kt` | The shell-side recorder — the one process that hears the call. | [Standard](__about/PrivilegedRecorder.md) |
+| `capture/shizuku/PrivilegedRecorder.kt` | The shell-side host of the engine — the one process that hears the call. | [Standard](__about/PrivilegedRecorder.md) |
 | `capture/shizuku/ShizukuManager.kt` | The one gatekeeper to the borrowed privilege. | [Standard](__about/ShizukuManager.md) |
-| `capture/shizuku/ShizukuCaptureSource.kt` | The Shizuku mechanism + its numbered setup guide. | Trivial |
+| `capture/shizuku/ShizukuCaptureSource.kt` | The quiet mechanism + its numbered setup guide. | Trivial |
 | `ui/AppNav.kt` | The shell: four tabs and the setup flow. | [Standard](__about/AppNav.md) |
 | `ui/AppViewModel.kt` | The single state holder behind every screen. | [Standard](__about/AppViewModel.md) |
 | `ui/theme/Theme.kt` | The calm palette and the slightly larger body type. | Trivial |
 | `ui/components/Pieces.kt` | Shared card, section, empty state and pill. | Trivial |
 | `ui/home/HomeScreen.kt` | One glance: is the phone protecting me right now. | Trivial |
 | `ui/recordings/RecordingsScreen.kt` | The data section — grouped by person, then time, with search. | Trivial |
+| `ui/recordings/RecordDetailScreen.kt` | One recording: worth, player, seal, transcript, share, delete. | [Standard](__about/RecordDetailScreen.md) |
 | `ui/numbers/NumbersScreen.kt` | The two lists and the two defaults. | Trivial |
 | `ui/settings/SettingsScreen.kt` | Lock, how the app looks, storage, version. | Trivial |
-| `ui/setup/SetupScreen.kt` | The numbered instructions, and the honest empty state. | Trivial |
+| `ui/setup/SetupScreen.kt` | The numbered instructions, permissions included, and the honest empty state. | Trivial |
+| `ui/setup/TestCallScreen.kt` | Twenty seconds that replace a promise with a measurement. | Trivial |
 
 User-facing copy lives in `res/values/strings.xml` (English) and
 `res/values-sr/strings.xml` (Serbian) — never hard-coded in a composable.
 
-### The capture mechanism — Shizuku (owner's word, 2026-09-11)
+### The capture mechanisms — quiet first, loudspeaker always (2026-09-14)
 
-`CaptureRegistry` now holds one entry: `ShizukuCaptureSource`. The chain is
-`CallWatcher` (notices the call) → `RecordingCoordinator` (applies the lists) →
-`ShizukuManager` → `PrivilegedRecorder` (records `VOICE_CALL` as the ADB shell) →
-`Vault` (sealed). The user pairs Shizuku once, guided by the setup screen; no
-computer, no root. Two things stay unproven until measured on a real phone:
-that `VOICE_CALL` as shell carries BOTH voices during a live call, and that the
-app re-arms itself cleanly after a reboot.
+`CaptureRegistry` holds three entries, in preference order:
+
+1. `ShizukuCaptureSource` — the call's own audio through borrowed ADB-shell
+   privilege. Silent, which for someone living with the caller is the feature.
+   Whether it carries both people is decided by the manufacturer's audio driver,
+   so it is measured rather than promised.
+2. `SpeakerphoneCaptureSource` (CARRIER) — speaker on, microphone recording the
+   room. Audible, and it works on every handset ever made, so it is what a phone
+   falls back to when the quiet route is measured half or refuses to open.
+3. `SpeakerphoneCaptureSource` (VOIP) — the same mechanism for calls inside
+   WhatsApp, Viber and Messenger, where there is no modem audio to tap at all.
+
+The chain is `CallWatcher` / `VoipWatcher` (notice the conversation) →
+`RecordingCoordinator` (choose a route, apply the lists) → `PcmRecorder` in one
+of its two hosts → `ChannelMeter` (measure while writing) → `VoiceCheck` (judge)
+→ `Vault` (sealed). The user pairs Shizuku once, guided by the setup screen; no
+computer, no root.
+
+**The twenty-second test call** is what turns EVERY PHONE, OR IT DOES NOT COUNT
+from a promise into a fact: she talks for five seconds, then stays silent for ten
+while the other side keeps talking, and sound arriving during her silence can
+only be the far party. The verdict is stored per route in `RouteMemory`, and
+until it exists the home screen does not say the phone is covered.
+
+Still unproven until someone runs it on a real handset: that the app re-arms
+itself cleanly after a reboot.
 
 ---
 
@@ -83,9 +116,11 @@ opens the privileged sources, the microphone pipe writes real audio, and the
 phone's own call recording is disabled by its regional firmware. What it never
 measured: a live call.
 
-That path is now closed by decree anyway — ONLY STEPS AN ORDINARY USER CAN DO
-rules out shell identity, Shizuku, ADB and root, whatever they can technically do.
-The probe stays on disk only until the owner says it may be deleted.
+That path is now the product's own: the owner chose Shizuku on 2026-09-11, and
+ONE SETUP, GUIDED, THEN NOTHING names its wireless-debugging pairing as the
+approved case. What stays forbidden is root, a firmware change, and anything
+needing a PC. The probe stays on disk only until the owner says it may be
+deleted.
 
 | File | Role |
 |------|------|

@@ -23,21 +23,33 @@ in.
 - **Every method is defensive.** This runs with elevated privilege — a thrown
   exception must return as a string the app can show, never a crash that takes
   the shell process down in the middle of a call.
-- **`probe()` measures, it does not assume.** It opens every source and reports
-  OPENED / REFUSED / ERR per source, so "does VOICE_CALL work on this phone" is
-  answered by evidence from the device, not by a guess in a doc.
-- **Peak amplitude is returned from `stop()`** so the app can tell "sound
-  arrived" from "silence" without decoding the WAV — the first, cheap half of
-  the both-voices judgement.
+- **It contributes a ladder, not an engine.** The recording itself is
+  `capture/PcmRecorder`, shared with the app-side microphone recorder (ONE KIND,
+  ONE CLASS). The one thing only this class can supply is the list of sources a
+  privileged uid may name: `VOICE_CALL` first, then `VOICE_DOWNLINK` — the far
+  party alone, which is the half the victim cannot produce herself and therefore
+  the half worth having.
+- **The app never names a source.** Which sources exist and which may be opened
+  is knowledge of the privileged side, so the AIDL takes only a descriptor and
+  reports back what actually opened.
+- **`probe()` measures, it does not assume.** It opens every source in both
+  stereo and mono and reports OPENED / REFUSED / ERR, so "does VOICE_CALL work on
+  this phone" is answered by evidence from the device, not by a guess in a doc.
+- **`stop()` returns a measurement, not a number.** It hands back the encoded
+  `capture/CaptureOutcome`: the source that opened, the channel count, and the
+  per-channel energy. The previous `int` peak could only say "not silent", which
+  is what let a one-sided recording pass as evidence.
 
 ## Unproven until measured on a real phone
 
 That `VOICE_CALL` as shell carries BOTH voices during a LIVE call. The channel
-is known to open; the contents are not yet confirmed. This is the project's one
-remaining measurement.
+is known to open; the contents are decided by the device's audio driver. That is
+no longer a gap in the design — the guided test call answers it per phone, and
+until it has, recordings from this route are `UNVERIFIED` rather than evidence.
 
 ## Connections
 
 - Declared by: `capture/shizuku/IRecorderService.aidl`.
+- Engine: `capture/PcmRecorder`.
 - Spawned and reached through: `capture/shizuku/ShizukuManager`.
-- Driven by: `capture/RecordingCoordinator`.
+- Offered by: `capture/shizuku/ShizukuCaptureSource`.

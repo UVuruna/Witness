@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!-- Knowing a call is happening, and who it is with. -->
+    <!-- Knowing a call is happening, and who it is with. Android 12 stopped
+         giving the number to call-state listeners, so the call log is the only
+         place left that says who called and in which direction. -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
+    <uses-permission android:name="android.permission.READ_CALL_LOG" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <!-- Capturing, and the visible service that must accompany it. -->

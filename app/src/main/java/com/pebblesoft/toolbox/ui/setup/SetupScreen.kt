@@ -1,6 +1,8 @@
 package com.pebblesoft.toolbox.ui.setup
 
 import android.content.Context
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -48,16 +50,25 @@ import com.pebblesoft.toolbox.ui.components.SoftCard
  * hunt through Settings. A step she has already completed shows a tick and
  * stops asking.
  *
- * ONLY STEPS AN ORDINARY USER CAN DO (CLAUDE.md): if a mechanism cannot be
+ * ONE SETUP, GUIDED, THEN NOTHING (CLAUDE.md): if a mechanism cannot be
  * explained as a short numbered list here, it does not ship. The empty state is
  * deliberate and honest — a phone that cannot do this is told so plainly rather
  * than walked into a setup that will not work.
+ *
+ * Permissions are steps like any other. The previous round put five dangerous
+ * permissions in the manifest and asked for none of them, which is the whole
+ * reason nothing recorded; asking from inside this numbered list, each with the
+ * sentence that says why, keeps the request in the one place the user is already
+ * being led through rather than in a burst of system dialogs.
  */
 @Composable
-fun SetupScreen(onDone: () -> Unit) {
+fun SetupScreen(onDone: () -> Unit, onGranted: () -> Unit = {}) {
     val context = LocalContext.current
     val source = CaptureRegistry.candidate(context)
     val guide = source?.guide(context)
+    val asker = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { onGranted() }
 
     if (guide == null) {
         EmptyState(
@@ -82,7 +93,7 @@ fun SetupScreen(onDone: () -> Unit) {
         }
 
         itemsIndexed(guide.steps) { index, step ->
-            StepCard(index + 1, step, context)
+            StepCard(index + 1, step, context) { permissions -> asker.launch(permissions.toTypedArray()) }
         }
 
         if (guide.keepInMind.isNotEmpty()) {
@@ -102,7 +113,12 @@ fun SetupScreen(onDone: () -> Unit) {
 }
 
 @Composable
-private fun StepCard(ordinal: Int, step: com.pebblesoft.toolbox.capture.Step, context: Context) {
+private fun StepCard(
+    ordinal: Int,
+    step: com.pebblesoft.toolbox.capture.Step,
+    context: Context,
+    onAsk: (List<String>) -> Unit,
+) {
     val done = step.isDone(context)
     Section {
         SoftCard {
@@ -134,11 +150,21 @@ private fun StepCard(ordinal: Int, step: com.pebblesoft.toolbox.capture.Step, co
             Spacer(Modifier.height(10.dp))
             Text(step.detail, style = MaterialTheme.typography.bodyMedium)
 
+            if (step.grant.isNotEmpty() && !done) {
+                Spacer(Modifier.height(12.dp))
+                Button(
+                    onClick = { onAsk(step.grant) },
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
+                ) {
+                    Text(stringResource(R.string.setup_allow))
+                }
+            }
+
             step.openScreen?.let { intent ->
                 Spacer(Modifier.height(12.dp))
                 OutlinedButton(
                     onClick = { runCatching { context.startActivity(intent) } },
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
                 ) {
                     Icon(Icons.AutoMirrored.Filled.OpenInNew, contentDescription = null)
                     Spacer(Modifier.width(8.dp))

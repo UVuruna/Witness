@@ -3,36 +3,67 @@ package com.pebblesoft.toolbox.capture.shizuku
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.ParcelFileDescriptor
 import android.provider.Settings
 import com.pebblesoft.toolbox.R
+import com.pebblesoft.toolbox.capture.CaptureOutcome
 import com.pebblesoft.toolbox.capture.CaptureSource
 import com.pebblesoft.toolbox.capture.Guide
+import com.pebblesoft.toolbox.capture.RouteMemory
+import com.pebblesoft.toolbox.capture.RouteRecorder
 import com.pebblesoft.toolbox.capture.Step
+import com.pebblesoft.toolbox.capture.VoiceCheck
+import com.pebblesoft.toolbox.permissions.RuntimePermissions
 
 /**
- * The Shizuku capture mechanism, described for the registry and the setup screen.
+ * The quiet route: the call's own audio, recorded by a borrowed privilege.
  *
- * This is the one entry in [com.pebblesoft.toolbox.capture.CaptureRegistry]: it
- * records both voices (VOICE_CALL as shell), so it is allowed to register. Its
- * [guide] is the numbered script the user follows once — every step in her own
- * words, and each with the deep link that takes her straight to the screen it
- * names, because ONLY the pairing itself is asked of her and nothing may be
- * left to a hunt through Settings.
+ * This is the one the product prefers, and the reason is not sound quality — it
+ * is that nobody in the room hears anything happen. For someone living with the
+ * person on the other end of the call, silence is the feature.
+ *
+ * What it cannot do is promise itself. Whether the far party actually reaches
+ * the file is decided below the app by the manufacturer's audio driver, and no
+ * API reports it. So [tested] returns what the guided test call measured here,
+ * [status] refuses to say READY until that measurement exists, and a phone where
+ * the measurement came back one-sided reports [CaptureSource.Status.PROVEN_HALF]
+ * — which ranks this route below the loudspeaker one that always works.
  */
-class ShizukuCaptureSource(private val manager: ShizukuManager) : CaptureSource {
+class ShizukuCaptureSource(
+    private val manager: ShizukuManager,
+    private val routes: RouteMemory,
+) : CaptureSource {
 
-    override val id = "shizuku-voicecall"
-    override val label = "Call audio (Shizuku)"
-    override val deliversBothVoices = true
+    override val id = ID
 
-    override fun status(context: Context): CaptureSource.Status = when (manager.state.value) {
-        ShizukuState.READY -> CaptureSource.Status.READY
-        else -> CaptureSource.Status.NEEDS_SETUP
+    override fun label(context: Context): String = context.getString(R.string.route_shizuku_label)
+
+    override fun tested(context: Context): VoiceCheck.Route = routes.verdict(id)
+
+    override fun status(context: Context): CaptureSource.Status {
+        if (!RuntimePermissions.allRequiredGranted(context)) return CaptureSource.Status.NEEDS_SETUP
+        if (manager.state.value != ShizukuState.READY) return CaptureSource.Status.NEEDS_SETUP
+        return when (routes.verdict(id)) {
+            VoiceCheck.Route.BOTH_PEOPLE -> CaptureSource.Status.READY
+            VoiceCheck.Route.UNTESTED -> CaptureSource.Status.NEEDS_TEST
+            VoiceCheck.Route.ONE_PERSON_ONLY -> CaptureSource.Status.PROVEN_HALF
+            VoiceCheck.Route.NOTHING -> CaptureSource.Status.UNAVAILABLE
+        }
+    }
+
+    override fun recorder(context: Context): RouteRecorder? {
+        val privileged = manager.recorder ?: return null
+        if (!manager.isReady()) return null
+        return object : RouteRecorder {
+            override fun start(sink: ParcelFileDescriptor): String = privileged.start(sink)
+            override fun stop(): CaptureOutcome = CaptureOutcome.decode(privileged.stop())
+            override fun isRecording(): Boolean = privileged.isRecording
+        }
     }
 
     override fun guide(context: Context): Guide = Guide(
         headline = context.getString(R.string.guide_shizuku_headline),
-        steps = listOf(
+        steps = RuntimePermissions.steps(context) + listOf(
             Step(
                 title = context.getString(R.string.guide_shizuku_1_title),
                 detail = context.getString(R.string.guide_shizuku_1_detail),
@@ -70,4 +101,8 @@ class ShizukuCaptureSource(private val manager: ShizukuManager) : CaptureSource 
 
     private fun launch(context: Context, pkg: String): Intent? =
         context.packageManager.getLaunchIntentForPackage(pkg)?.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+
+    companion object {
+        const val ID = "shizuku-voicecall"
+    }
 }

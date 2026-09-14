@@ -7,6 +7,10 @@
 // shell process writes bytes into a file the APP owns — nothing privileged
 // ever touches app-private storage directly.
 //
+// The app never names an audio source. Which sources exist and which may be
+// opened is knowledge of the privileged side, so the ladder lives there and
+// what actually opened comes back in the result.
+//
 // AIDL requires either NO method has an id or EVERY method does; Shizuku
 // reserves destroy()=16777114, so all are numbered explicitly.
 package com.pebblesoft.toolbox.capture.shizuku;
@@ -15,13 +19,14 @@ interface IRecorderService {
     // Probe every audio source and report, per source, whether it OPENS.
     String probe() = 1;
 
-    // Begin capturing `audioSource` (a MediaRecorder.AudioSource constant) as
-    // 16-bit PCM WAV into `sink`. Returns "" on success or an error string.
-    String start(int audioSource, in ParcelFileDescriptor sink) = 2;
+    // Begin capturing the call as 16-bit PCM WAV into `sink`, stereo where the
+    // device offers it. Returns "" on success or an error string.
+    String start(in ParcelFileDescriptor sink) = 2;
 
-    // Stop and finalise the WAV. Returns the peak amplitude seen, so the app
-    // can tell "sound arrived" from "silence" without decoding the file.
-    int stop() = 3;
+    // Stop and finalise the WAV. Returns the encoded CaptureOutcome: which
+    // source opened, how many channels, and the per-channel measurement the
+    // app needs to decide whether both people are in the file.
+    String stop() = 3;
 
     boolean isRecording() = 4;
 

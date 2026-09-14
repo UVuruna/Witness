@@ -66,8 +66,10 @@
     <string name="rec_outgoing">Odlazni</string>
     <string name="rec_unknown_number">Nepoznat broj</string>
     <string name="rec_quality_evidence">Oba glasa</string>
+    <string name="rec_quality_one_voice">Samo ti</string>
     <string name="rec_quality_unverified">Još nije provereno</string>
     <string name="rec_quality_failed">Neupotrebljivo</string>
+    <string name="rec_quality_not_captured">Nije sačuvano</string>
     <string name="rec_transcript_none">Nema teksta</string>
     <string name="rec_transcript_pending">Pišem tekst…</string>
     <string name="rec_transcript_done">Tekst je spreman</string>
@@ -75,6 +77,13 @@
     <string name="rec_count">%1$d snimaka</string>
 
     <!-- Recording detail -->
+    <string name="rec_direction_unknown">Poziv</string>
+    <string name="detail_open_failed">Ovaj snimak nije mogao da se otvori.</string>
+    <string name="detail_quality_both">Oboje ste u ovom snimku. Može da posluži kao dokaz šta je rečeno.</string>
+    <string name="detail_quality_one">U ovom fajlu je samo tvoj glas. Čuva se, ali ne dokazuje šta je druga osoba rekla.</string>
+    <string name="detail_quality_unverified">Ništa nije dokazalo ko je u ovom snimku. Uradi proveru na svom telefonu i sledeći pozivi će znati pouzdano.</string>
+    <string name="detail_quality_failed">Iz ovog poziva nije snimljeno ništa upotrebljivo.</string>
+    <string name="detail_quality_not_captured">Ovaj poziv se desio i nije mogao da se sačuva. Zapisan je da bi se rupa videla.</string>
     <string name="detail_play">Pusti</string>
     <string name="detail_pause">Pauza</string>
     <string name="detail_transcript">Tekst razgovora</string>
@@ -115,6 +124,11 @@
     <string name="settings_pin_set">Promeni PIN</string>
     <string name="settings_pin_unset">Postavi PIN</string>
     <string name="settings_biometric">Otvaraj otiskom prsta</string>
+    <string name="settings_capture_section">Kako se pozivi čuvaju</string>
+    <string name="settings_speakerphone_calls">Čuvaj pozive preko zvučnika</string>
+    <string name="settings_speakerphone_calls_detail">Radi na svakom telefonu, ali se poziv čuje naglas.</string>
+    <string name="settings_speakerphone_voip">Čuvaj pozive iz drugih aplikacija</string>
+    <string name="settings_speakerphone_voip_detail">WhatsApp, Viber, Messenger. Takođe preko zvučnika — tihog načina nema.</string>
     <string name="settings_look_section">Kako aplikacija izgleda na tvom telefonu</string>
     <string name="settings_look_real">Svoje ime i ikona</string>
     <string name="settings_look_neutral">Neutralno ime i ikona</string>
@@ -129,6 +143,66 @@
     <string name="lock_wrong">PIN nije tačan</string>
     <string name="lock_biometric">Otisak prsta</string>
     <string name="lock_biometric_prompt">Otključaj</string>
+
+    <!-- Dozvole: naslov i razlog, njenim rečima, nikad Androidovim -->
+    <string name="perm_microphone_title">Dozvoli mikrofon</string>
+    <string name="perm_microphone_why">Bez ovoga se ništa ne može sačuvati. Dodirni Dozvoli i izaberi „Dok koristim aplikaciju\".</string>
+    <string name="perm_call_state_title">Dozvoli da primetim poziv</string>
+    <string name="perm_call_state_why">Da aplikacija zna da je poziv počeo i da sama krene da čuva.</string>
+    <string name="perm_call_log_title">Dozvoli spisak poziva</string>
+    <string name="perm_call_log_why">Da uz svaki sačuvani poziv piše broj i da li si ti zvala ili su zvali tebe.</string>
+    <string name="perm_contacts_title">Dozvoli kontakte</string>
+    <string name="perm_contacts_why">Da se na tvojim listama vide imena umesto brojeva. Ovo možeš i da preskočiš.</string>
+    <string name="perm_notifications_title">Dozvoli tihu poruku</string>
+    <string name="perm_notifications_why">Android prikazuje malu poruku dok aplikacija prati pozive. Ovo možeš i da preskočiš.</string>
+    <string name="setup_allow">Dozvoli</string>
+
+    <!-- Dva načina da se poziv sačuva -->
+    <string name="route_shizuku_label">Tiho, tokom poziva</string>
+    <string name="route_speakerphone_label">Naglas, preko zvučnika</string>
+    <string name="route_speakerphone_voip_label">Pozivi iz drugih aplikacija, preko zvučnika</string>
+
+    <!-- Uputstvo za zvučnik -->
+    <string name="guide_speaker_headline">Čuvanje poziva preko zvučnika</string>
+    <string name="guide_speaker_1_title">Znaj šta ovo radi</string>
+    <string name="guide_speaker_1_detail">Poziv ide na zvučnik, a mikrofon sačuva oboje. Radi na svakom telefonu — ali svako ko je u sobi čuje poziv.</string>
+    <string name="guide_speaker_2_title">Uključi to</string>
+    <string name="guide_speaker_2_detail">Idi u Podešavanja ove aplikacije i uključi čuvanje preko zvučnika. Možeš da isključiš kad god hoćeš.</string>
+    <string name="guide_speaker_keep_audible">Dok je ovo uključeno, pozivi koje čuvaš čuju se naglas. Isključi kad je neko blizu.</string>
+
+    <!-- Pozivi iz drugih aplikacija -->
+    <string name="guide_voip_headline">Pozivi u WhatsApp-u, Viber-u, Messenger-u</string>
+    <string name="guide_voip_2_title">Uključi čuvanje tih poziva</string>
+    <string name="guide_voip_2_detail">Ti pozivi mogu da se sačuvaju samo preko zvučnika. Ako je ovo isključeno, aplikacija svejedno zapiše da je poziv bio i da nije sačuvan.</string>
+
+    <!-- Servis -->
+    <string name="service_problem_permissions">Nešto što aplikaciji treba još nije dozvoljeno, pa se pozivi ne čuvaju.</string>
+    <string name="service_problem_start">Aplikacija nije uspela da počne da prati pozive. Otvori je jednom i pokušaj ponovo.</string>
+
+    <!-- Probni poziv -->
+    <string name="test_title">Proveri ovaj telefon</string>
+    <string name="test_intro">Dvadeset sekundi nam kaže istinu o tvom telefonu: da li druga osoba stvarno završi u snimku, ili samo ti.</string>
+    <string name="test_step_1">Dodirni Počni, pa pozovi bilo koga — najlakše je tvoja govorna pošta.</string>
+    <string name="test_step_2">Pričaj prvih pet sekundi.</string>
+    <string name="test_step_3">Onda ćuti deset sekundi i pusti drugu stranu da priča. Prekini poziv.</string>
+    <string name="test_start">Počni proveru</string>
+    <string name="test_waiting">Čekam tvoj poziv…</string>
+    <string name="test_recording">Slušam. Sad ćuti i pusti drugu stranu da priča.</string>
+    <string name="test_result_both">Oboje ste u snimku. Ovaj telefon je pokriven.</string>
+    <string name="test_result_one">Na ovom telefonu se u snimku čuješ samo ti. Čuvanje preko zvučnika je način koji ovde radi.</string>
+    <string name="test_result_nothing">Na ovom telefonu tim putem nije snimljeno ništa.</string>
+    <string name="test_again">Proveri ponovo</string>
+    <string name="test_wifi_hint">Ima još jedna stvar za probu: pozivi preko Wi-Fi mreže su često nemi za svako snimanje. Isključi „Pozivi preko Wi-Fi mreže\", pa proveri ponovo.</string>
+    <string name="test_wifi_open">Otvori podešavanja Wi-Fi poziva</string>
+    <string name="test_nothing_checked">Na ovom telefonu još nije provereno.</string>
+
+    <!-- Početni ekran, kad telefon nije pokriven -->
+    <string name="home_state_test">Ostala je jedna provera</string>
+    <string name="home_state_test_detail">Dvadeset sekundi na pravom pozivu kaže nam da li druga osoba završi u snimku.</string>
+    <string name="home_test_button">Proveri moj telefon</string>
+    <string name="home_state_half">Sačuvala bi se samo ti</string>
+    <string name="home_state_half_detail">Na ovom telefonu tihi način snima samo tebe. Uključi čuvanje preko zvučnika i sačuvate se oboje.</string>
+    <string name="home_state_problem">Pozivi se ne čuvaju</string>
 
     <!-- Common -->
     <string name="cancel">Otkaži</string>

@@ -32,6 +32,10 @@ import java.util.Locale
  */
 @Composable
 fun SettingsScreen(
+    speakerphoneCalls: Boolean,
+    onSpeakerphoneCalls: (Boolean) -> Unit,
+    speakerphoneVoip: Boolean,
+    onSpeakerphoneVoip: (Boolean) -> Unit,
     biometricOn: Boolean,
     onBiometric: (Boolean) -> Unit,
     neutralLook: Boolean,
@@ -40,6 +44,26 @@ fun SettingsScreen(
     versionName: String,
 ) {
     AdaptiveBody(spacing = 18.dp) {
+        item {
+            Section(stringResource(R.string.settings_capture_section)) {
+                SoftCard {
+                    SwitchRow(
+                        title = stringResource(R.string.settings_speakerphone_calls),
+                        detail = stringResource(R.string.settings_speakerphone_calls_detail),
+                        checked = speakerphoneCalls,
+                        onChange = onSpeakerphoneCalls,
+                    )
+                    Spacer(Modifier.height(14.dp))
+                    SwitchRow(
+                        title = stringResource(R.string.settings_speakerphone_voip),
+                        detail = stringResource(R.string.settings_speakerphone_voip_detail),
+                        checked = speakerphoneVoip,
+                        onChange = onSpeakerphoneVoip,
+                    )
+                }
+            }
+        }
+
         item {
             Section(stringResource(R.string.settings_lock_section)) {
                 SoftCard {

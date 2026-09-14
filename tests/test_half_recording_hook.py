@@ -5,6 +5,10 @@ not end while its final message hands over a result in which the other party is
 missing from the recording. A hook nobody tests is a promise, not a guard — so
 these cases pin both directions: the forbidden claim blocks, a real both-sides
 solution passes.
+
+Clarified 2026-09-14 (owner): "both voices" counts two PEOPLE, not one audio
+path — a recording made through the microphone with the speaker on satisfies
+the decree, so a message offering that route must pass.
 """
 
 from __future__ import annotations
@@ -36,6 +40,11 @@ ALLOWED = [
         "Sagovornik se ne cuje preko sistemskog Telefona. "
         "obe-strane-resenje: poziv kroz aplikaciju snima obe strane.",
         id="limitation-plus-escape-marker",
+    ),
+    pytest.param(
+        "Na ovom telefonu tihi put daje samo jedan glas. "
+        "obe-strane-resenje: spikerfon ukljucen, mikrofon snima obe osobe u istom fajlu.",
+        id="speakerphone-counts-as-both-people",
     ),
     pytest.param("Whitelist i data sekcija su gotove, transkript radi.", id="unrelated-progress"),
 ]

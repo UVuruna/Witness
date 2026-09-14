@@ -26,6 +26,11 @@ SOURCE_EXTENSIONS = {".py", ".kt", ".kts", ".js", ".ts", ".html", ".css"}
 # config surfaces separately.)
 EXCLUDE_FILE_NAMES = {
     "build.gradle.kts", "settings.gradle.kts", "gradle.properties",
+    # Hand-test instructions written FOR THE OWNER, in his language, and
+    # gitignored at his request. It ships to nobody and is deliberately not
+    # part of the navigation chain, so the doc guards must not demand a link
+    # to it from README — a link would break on any fresh clone.
+    "PROVERA.md",
 }
 
 

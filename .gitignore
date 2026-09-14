@@ -3,6 +3,10 @@ UV/
 .claude/
 prompt.txt
 
+# Written for the owner, in his language, to test a build by hand. Not a
+# project doc and not part of the navigation chain (he asked for it ignored).
+PROVERA.md
+
 # Python guard-test caches
 __pycache__/
 .pytest_cache/

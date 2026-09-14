@@ -69,8 +69,10 @@
     <string name="rec_outgoing">Outgoing</string>
     <string name="rec_unknown_number">Unknown number</string>
     <string name="rec_quality_evidence">Both voices</string>
+    <string name="rec_quality_one_voice">Only you</string>
     <string name="rec_quality_unverified">Not checked yet</string>
     <string name="rec_quality_failed">Unusable</string>
+    <string name="rec_quality_not_captured">Not saved</string>
     <string name="rec_transcript_none">No text</string>
     <string name="rec_transcript_pending">Writing the text…</string>
     <string name="rec_transcript_done">Text ready</string>
@@ -78,6 +80,13 @@
     <string name="rec_count">%1$d recordings</string>
 
     <!-- Recording detail -->
+    <string name="rec_direction_unknown">Call</string>
+    <string name="detail_open_failed">This recording could not be opened.</string>
+    <string name="detail_quality_both">Both of you are in this recording. It can be used as proof of what was said.</string>
+    <string name="detail_quality_one">Only your own voice is in this file. It is kept, but it does not prove what the other person said.</string>
+    <string name="detail_quality_unverified">Nothing has proven who is in this recording. Run the check on your phone and later calls will say for certain.</string>
+    <string name="detail_quality_failed">Nothing usable was recorded from this call.</string>
+    <string name="detail_quality_not_captured">This call happened and could not be saved. It is written down so the gap is visible.</string>
     <string name="detail_play">Play</string>
     <string name="detail_pause">Pause</string>
     <string name="detail_transcript">Text of the call</string>
@@ -118,6 +127,11 @@
     <string name="settings_pin_set">Change PIN</string>
     <string name="settings_pin_unset">Set a PIN</string>
     <string name="settings_biometric">Open with fingerprint</string>
+    <string name="settings_capture_section">How calls are saved</string>
+    <string name="settings_speakerphone_calls">Save calls on the speaker</string>
+    <string name="settings_speakerphone_calls_detail">Works on every phone, but the call is heard out loud.</string>
+    <string name="settings_speakerphone_voip">Save calls in other apps</string>
+    <string name="settings_speakerphone_voip_detail">WhatsApp, Viber, Messenger. Also on the speaker — there is no quiet way.</string>
     <string name="settings_look_section">How the app looks on your phone</string>
     <string name="settings_look_real">Its own name and icon</string>
     <string name="settings_look_neutral">A neutral name and icon</string>
@@ -132,6 +146,66 @@
     <string name="lock_wrong">That PIN is not right</string>
     <string name="lock_biometric">Use fingerprint</string>
     <string name="lock_biometric_prompt">Unlock</string>
+
+    <!-- Permissions: one title and one reason each, in her words, never Android's -->
+    <string name="perm_microphone_title">Allow the microphone</string>
+    <string name="perm_microphone_why">Without this nothing can be saved at all. Tap Allow and choose \"While using the app\".</string>
+    <string name="perm_call_state_title">Allow calls to be noticed</string>
+    <string name="perm_call_state_why">So the app knows a call has started and can begin saving by itself.</string>
+    <string name="perm_call_log_title">Allow the call list</string>
+    <string name="perm_call_log_why">So each saved call shows the number and whether you called or were called.</string>
+    <string name="perm_contacts_title">Allow contacts</string>
+    <string name="perm_contacts_why">So your lists show names instead of numbers. You can skip this one.</string>
+    <string name="perm_notifications_title">Allow the quiet notice</string>
+    <string name="perm_notifications_why">Android shows a small notice while the app is watching. You can skip this one.</string>
+    <string name="setup_allow">Allow</string>
+
+    <!-- The two ways of saving a call -->
+    <string name="route_shizuku_label">Quietly, during the call</string>
+    <string name="route_speakerphone_label">Out loud, on the speaker</string>
+    <string name="route_speakerphone_voip_label">Calls in other apps, on the speaker</string>
+
+    <!-- Speakerphone guide -->
+    <string name="guide_speaker_headline">Save calls on the speaker</string>
+    <string name="guide_speaker_1_title">Know what this does</string>
+    <string name="guide_speaker_1_detail">The call goes to the speaker and the microphone saves both of you. It works on every phone — but anyone in the room hears the call.</string>
+    <string name="guide_speaker_2_title">Turn it on</string>
+    <string name="guide_speaker_2_detail">Go to Settings in this app and turn on saving on the speaker. You can turn it off again at any time.</string>
+    <string name="guide_speaker_keep_audible">While this is on, calls you save are heard out loud. Turn it off when someone is nearby.</string>
+
+    <!-- Calls inside other apps -->
+    <string name="guide_voip_headline">Calls in WhatsApp, Viber, Messenger</string>
+    <string name="guide_voip_2_title">Turn on saving for those calls</string>
+    <string name="guide_voip_2_detail">Those calls can only be saved on the speaker. If this is off, the app still writes down that the call happened and that it was not saved.</string>
+
+    <!-- Service -->
+    <string name="service_problem_permissions">Something the app needs is not allowed yet, so calls are not being saved.</string>
+    <string name="service_problem_start">The app could not start watching for calls. Open it once and try again.</string>
+
+    <!-- The test call -->
+    <string name="test_title">Check this phone</string>
+    <string name="test_intro">Twenty seconds tells us the truth about your phone: whether the other person really ends up in the recording, or only you.</string>
+    <string name="test_step_1">Tap Start, then call anyone — your voicemail is easiest.</string>
+    <string name="test_step_2">Talk for the first five seconds.</string>
+    <string name="test_step_3">Then stay quiet for ten seconds and let the other side talk. Hang up.</string>
+    <string name="test_start">Start the check</string>
+    <string name="test_waiting">Waiting for your call…</string>
+    <string name="test_recording">Listening. Stay quiet now and let the other side talk.</string>
+    <string name="test_result_both">Both of you are in the recording. This phone is covered.</string>
+    <string name="test_result_one">Only you are in the recording on this phone. Saving on the speaker is the way that works here.</string>
+    <string name="test_result_nothing">Nothing was recorded on this phone that way.</string>
+    <string name="test_again">Check again</string>
+    <string name="test_wifi_hint">One more thing to try: calls over Wi-Fi are often silent to any recorder. Turn off \"Wi-Fi calling\", then check again.</string>
+    <string name="test_wifi_open">Open Wi-Fi calling settings</string>
+    <string name="test_nothing_checked">Not checked on this phone yet.</string>
+
+    <!-- Home, when the phone is not covered -->
+    <string name="home_state_test">One check is left</string>
+    <string name="home_state_test_detail">Twenty seconds on a real call tells us whether the other person ends up in the recording.</string>
+    <string name="home_test_button">Check my phone</string>
+    <string name="home_state_half">Only you would be saved</string>
+    <string name="home_state_half_detail">On this phone the quiet way records you alone. Turn on saving through the speaker and both of you are saved.</string>
+    <string name="home_state_problem">Calls are not being saved</string>
 
     <!-- Common -->
     <string name="cancel">Cancel</string>

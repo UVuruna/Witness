@@ -56,7 +56,9 @@ Owner decrees, newest first. Each is WHAT · WHO CHECKS.
 
 - **A RECORDING WITHOUT BOTH VOICES IS NOT A RESULT** (2026-09-11). Nothing may
   be delivered — plan, table, feature or report — whose answer to "is the other
-  party in the recording?" is no. · `tests/hook_no_half_recording.py` (Stop
+  party in the recording?" is no. **Two voices means two PEOPLE, by any route**
+  (owner, 2026-09-14): the audio path does not matter, so speakerphone plus
+  microphone satisfies it in full. · `tests/hook_no_half_recording.py` (Stop
   hook), pinned by `tests/test_half_recording_hook.py`.
 - **EVERY PHONE, OR IT DOES NOT COUNT** (2026-09-11). A mechanism confined to
   one manufacturer is not a mechanism. The built-in dialer recorder is DEAD and
@@ -65,13 +67,15 @@ Owner decrees, newest first. Each is WHAT · WHO CHECKS.
   the same breath: what we build · what the owner provides · every step the user
   takes · what is still unproven · what it costs · which phones it covers. ·
   review.
-- **ONE SETUP, GUIDED, THEN NOTHING** (2026-09-11, replaces the stricter
-  2026-09-11 morning rule). The user may be asked for ONE setup she performs on
-  her own phone, with the app leading her step by step and no computer involved
-  — Shizuku's wireless-debugging pairing is the approved case. Everything after
-  it must be automatic, including after a reboot; where auto-restart fails, the
-  app offers one button, never a procedure. Still forbidden: root, a
-  firmware/CSC change, anything needing a PC. · review.
+- **ONE SETUP, GUIDED, THEN NOTHING** (2026-09-11, widened 2026-09-14). The user
+  may be asked for ONE setup she performs on her own phone, with the app leading
+  her step by step and no computer involved — Shizuku's wireless-debugging
+  pairing is the approved case. A system setting she changes herself is allowed
+  only as the cure for a MEASURED failure, guided by the app — Wi-Fi calling off
+  is the named case (2026-09-14). Everything after it
+  must be automatic, including after a reboot;
+  where auto-restart fails, the app offers one button, never a procedure. Still
+  forbidden: root, a firmware/CSC change, anything needing a PC. · review.
 - **PRIVACY IS A LAW, NOT A FEATURE.** No audio, transcript or metadata leaves
   the device except through a channel the user explicitly enabled. No analytics,
   no telemetry, no crash reporting carrying content. · review.
@@ -97,9 +101,9 @@ Owner decrees, newest first. Each is WHAT · WHO CHECKS.
 
 ## Open items
 
-- **Capture is Shizuku** (owner's word, 2026-09-11). Two things stay unproven
-  until measured: that the privileged channel carries both voices during a LIVE
-  call, and that the app can re-arm itself after a reboot.
+- **Capture is Shizuku first, loudspeaker always** (2026-09-11 / 2026-09-14).
+  Both-voices coverage is MEASURED per phone by the guided test call. Still
+  unproven: re-arming after a reboot.
 - **Folder rename** `Safety` → `Witness` ([RENAME.md](RENAME.md)) — still not
   executed; the tool refuses to run from inside the folder.
 - **applicationId** is `com.pebblesoft.toolbox` (neutral, as RENAME.md requires).

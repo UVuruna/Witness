@@ -55,8 +55,12 @@ TRIVIAL: set[str] = {
     # Capture branch (Shizuku, 2026-09-11) — Trivial: thin platform wrappers and
     # a boot hook whose whole story is in app/___app.md.
     "app/src/main/java/com/pebblesoft/toolbox/capture/BootReceiver.kt",
-    "app/src/main/java/com/pebblesoft/toolbox/capture/CaptureService.kt",
     "app/src/main/java/com/pebblesoft/toolbox/capture/shizuku/ShizukuCaptureSource.kt",
+    # The measured-capture branch (2026-09-14) — Trivial: file-format plumbing,
+    # a plain data holder with its wire form, and a declarative screen.
+    "app/src/main/java/com/pebblesoft/toolbox/capture/WavWriter.kt",
+    "app/src/main/java/com/pebblesoft/toolbox/capture/CaptureOutcome.kt",
+    "app/src/main/java/com/pebblesoft/toolbox/ui/setup/TestCallScreen.kt",
 }
 
 # THE PRODUCT — Standard files: each carries a decision that outlives its code
@@ -74,9 +78,26 @@ STANDARD: set[str] = {
     "app/src/main/java/com/pebblesoft/toolbox/capture/CallWatcher.kt",
     "app/src/main/java/com/pebblesoft/toolbox/capture/shizuku/ShizukuManager.kt",
     "app/src/main/java/com/pebblesoft/toolbox/capture/shizuku/PrivilegedRecorder.kt",
+    # Measured capture (2026-09-14): the law "a recording without both voices is
+    # not a result" is kept or broken in each of these, so each owes its reasoning.
+    "app/src/main/java/com/pebblesoft/toolbox/capture/CaptureService.kt",
+    "app/src/main/java/com/pebblesoft/toolbox/capture/ChannelMeter.kt",
+    "app/src/main/java/com/pebblesoft/toolbox/capture/PcmRecorder.kt",
+    "app/src/main/java/com/pebblesoft/toolbox/capture/MicRecorder.kt",
+    "app/src/main/java/com/pebblesoft/toolbox/capture/SpeakerphoneCaptureSource.kt",
+    "app/src/main/java/com/pebblesoft/toolbox/capture/CallIdentity.kt",
+    "app/src/main/java/com/pebblesoft/toolbox/capture/VoipWatcher.kt",
+    "app/src/main/java/com/pebblesoft/toolbox/capture/RouteMemory.kt",
+    "app/src/main/java/com/pebblesoft/toolbox/permissions/RuntimePermissions.kt",
+    # The only screen from which evidence can leave the app.
+    "app/src/main/java/com/pebblesoft/toolbox/ui/recordings/RecordDetailScreen.kt",
 }
 
-ALGORITHMIC: set[str] = set()
+# The one place a recording is judged. It is a decision procedure with two
+# independent proofs and a set of thresholds, so it owes a flow doc as well.
+ALGORITHMIC: set[str] = {
+    "app/src/main/java/com/pebblesoft/toolbox/capture/VoiceCheck.kt",
+}
 
 ALL_CLASSIFIED = TRIVIAL | STANDARD | ALGORITHMIC
 
