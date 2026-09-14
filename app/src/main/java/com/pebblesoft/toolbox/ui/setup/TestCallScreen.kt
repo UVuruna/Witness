@@ -59,7 +59,8 @@ import com.pebblesoft.toolbox.ui.components.fullWidthItem
 @Composable
 fun TestCallScreen(
     state: TestState,
-    onArm: () -> Unit,
+    voipEnabled: Boolean,
+    onArm: (String?) -> Unit,
     onDone: () -> Unit,
 ) {
     val context = LocalContext.current
@@ -86,9 +87,22 @@ fun TestCallScreen(
                 fullWidthItem {
                     Section {
                         Button(
-                            onClick = onArm,
+                            onClick = { onArm(null) },
                             modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
                         ) { Text(stringResource(R.string.test_start)) }
+
+                        // A call inside another app never reaches the telephony
+                        // path, so it can only be measured by naming its route.
+                        // Without this button that route stays untested for the
+                        // life of the install, and everything it records is
+                        // filed "not checked" no matter how good it is.
+                        if (voipEnabled) {
+                            Spacer(Modifier.height(10.dp))
+                            OutlinedButton(
+                                onClick = { onArm(SpeakerphoneCaptureSource.Variant.VOIP.id) },
+                                modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
+                            ) { Text(stringResource(R.string.test_start_voip)) }
+                        }
                     }
                 }
             }
@@ -128,7 +142,7 @@ fun TestCallScreen(
                 fullWidthItem {
                     Section {
                         OutlinedButton(
-                            onClick = onArm,
+                            onClick = { onArm(state.sourceId.takeIf { it.isNotEmpty() }) },
                             modifier = Modifier.fillMaxWidth().heightIn(min = 48.dp),
                         ) { Text(stringResource(R.string.test_again)) }
                         Spacer(Modifier.height(10.dp))

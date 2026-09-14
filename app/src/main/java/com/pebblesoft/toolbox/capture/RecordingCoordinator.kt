@@ -2,6 +2,7 @@ package com.pebblesoft.toolbox.capture
 
 import android.content.Context
 import android.os.ParcelFileDescriptor
+import android.util.Log
 import com.pebblesoft.toolbox.app
 import com.pebblesoft.toolbox.data.CallRecord
 import com.pebblesoft.toolbox.data.Direction
@@ -80,18 +81,44 @@ class RecordingCoordinator(
     private val mutex = Mutex()
     private var session: Session? = null
     private var testArmed = false
+    private var testRouteId: String? = null
+
+    /**
+     * True from the moment telephony goes off-hook to the moment it goes idle,
+     * whatever the lists decided.
+     *
+     * [VoipWatcher] needs to know that a conversation is a carrier call, and the
+     * platform is the wrong place to ask: the audio mode moves for both kinds,
+     * and the call-state getter is served by Telecom, which on modern Android
+     * also sees the self-managed connections WhatsApp, Signal and Teams
+     * register — the very apps the VoIP route exists for. Asking there could
+     * silence VoIP detection for exactly them. The app's own eyes cannot be
+     * wrong about this, so they are the source of truth.
+     */
+    @Volatile var carrierCallInProgress: Boolean = false
+        private set
 
     private val _test = MutableStateFlow(TestState())
     val test: StateFlow<TestState> = _test
 
-    /** Arm the guided test: the next call is measured, then thrown away. */
-    fun armTest() {
+    /**
+     * Arm the guided test.
+     *
+     * @param routeId the route to measure, or null for the best available one.
+     * The loudspeaker route for calls inside other apps can ONLY be measured by
+     * naming it: such a call never reaches the carrier path, so without this it
+     * would stay untested for the life of the install and every recording it
+     * made would be filed UNVERIFIED forever.
+     */
+    fun armTest(routeId: String? = null) {
         testArmed = true
-        _test.value = TestState(phase = TestPhase.ARMED)
+        testRouteId = routeId
+        _test.value = TestState(phase = TestPhase.ARMED, sourceId = routeId.orEmpty())
     }
 
     fun cancelTest() {
         testArmed = false
+        testRouteId = null
         _test.value = TestState()
     }
 
@@ -101,7 +128,8 @@ class RecordingCoordinator(
      * thing that stops capture here; everything else is judged at the end.
      */
     suspend fun onCallStarted(numberHint: String?) {
-        begin(numberHint, if (testArmed) Kind.TEST else Kind.CARRIER)
+        carrierCallInProgress = true
+        begin(numberHint, if (testArmed && !testingVoip()) Kind.TEST else Kind.CARRIER)
     }
 
     /**
@@ -113,12 +141,50 @@ class RecordingCoordinator(
      * not saved: a gap she can see beats a gap she cannot.
      */
     suspend fun onVoipStarted() {
-        begin(numberHint = null, kind = Kind.VOIP)
+        begin(numberHint = null, kind = if (testingVoip()) Kind.TEST else Kind.VOIP)
     }
+
+    /** Telephony went idle. Ends a carrier or test session, never a VoIP one. */
+    suspend fun onCallEnded() {
+        carrierCallInProgress = false
+        finish(Kind.VOIP)
+    }
+
+    /** The audio mode left communication. Ends a VoIP or test session only. */
+    suspend fun onVoipEnded() {
+        finish(Kind.CARRIER)
+    }
+
+    /**
+     * The service is going away mid-conversation. Stop the recorder and file
+     * what there is, rather than leaving a worker thread reading the room with
+     * the loudspeaker on and a session that blocks every later call.
+     */
+    suspend fun abandon() {
+        carrierCallInProgress = false
+        finish(exceptKind = null)
+    }
+
+    private fun testingVoip(): Boolean =
+        testArmed && testRouteId == SpeakerphoneCaptureSource.Variant.VOIP.id
 
     private suspend fun begin(numberHint: String?, kind: Kind) {
         mutex.withLock {
-            if (session != null) return
+            val open = session
+            if (open != null) {
+                // Call waiting, or a conversation starting while another is
+                // still open. It cannot be recorded — one recorder, one audio
+                // source — but it must not vanish either, and the previous shape
+                // returned here silently while the class doc promised a row.
+                if (kind != Kind.TEST && open.kind != kind) {
+                    fileRecord(
+                        number = numberHint.orEmpty(), name = null, direction = Direction.UNKNOWN,
+                        startedAt = System.currentTimeMillis(), duration = 0, bytes = 0, seal = null,
+                        quality = Quality.NOT_CAPTURED, file = "", source = "busy",
+                    )
+                }
+                return
+            }
 
             if (kind == Kind.CARRIER && numberHint != null) {
                 val early = context.app.policy.decide(numberHint, CallIdentity.isInContacts(context, numberHint))
@@ -148,9 +214,21 @@ class RecordingCoordinator(
         }
     }
 
-    /** The call is over. Stop, measure, judge, seal, file. */
-    suspend fun onCallEnded() {
-        val finished = mutex.withLock { session.also { session = null } } ?: return
+    /**
+     * A conversation is over. Stop, measure, judge, seal, file.
+     *
+     * @param exceptKind a session of this kind belongs to the OTHER watcher and
+     * is left alone. Both watchers used to call one argument-less method, so on
+     * a handset whose audio mode lingers after hang-up the mode listener could
+     * end a live carrier recording, or a carrier hang-up could end a VoIP one.
+     */
+    private suspend fun finish(exceptKind: Kind?) {
+        val finished = mutex.withLock {
+            val open = session ?: return
+            if (exceptKind != null && open.kind == exceptKind) return
+            session = null
+            open
+        }
         val outcome = finished.recorder
             ?.let { active -> runCatching { active.stop() }.getOrElse { CaptureOutcome.failed(it.message.orEmpty()) } }
             ?: CaptureOutcome.failed(finished.startError)
@@ -162,6 +240,35 @@ class RecordingCoordinator(
         }
 
         val duration = System.currentTimeMillis() - finished.startedAt
+
+        // The audio mode moves for things that are not conversations — a
+        // Bluetooth headset connecting, an assistant turn, a web page. Filing a
+        // row for every blip fills her evidence list with calls that never
+        // happened, which corrodes the one promise this feature makes.
+        if (finished.kind == Kind.VOIP && duration < VOIP_FLOOR_MS && finished.plaintext == null) {
+            return
+        }
+
+        // Everything below touches Room, DataStore, the keystore and the disk.
+        // Any of them can throw, and the scope this runs in has no exception
+        // handler — an escape would kill the process and lose the recording
+        // instead of losing one field. Whatever fails, a row gets written.
+        runCatching { fileFinished(finished, outcome, duration) }
+            .onFailure { failure ->
+                finished.plaintext?.delete()
+                runCatching {
+                    fileRecord(
+                        number = finished.numberHint.orEmpty(), name = null,
+                        direction = Direction.UNKNOWN, startedAt = finished.startedAt,
+                        duration = duration, bytes = 0, seal = null, quality = Quality.FAILED,
+                        file = "", source = finished.sourceId,
+                    )
+                }
+                Log.e(TAG, "filing the finished call failed", failure)
+            }
+    }
+
+    private suspend fun fileFinished(finished: Session, outcome: CaptureOutcome, duration: Long) {
         val party = if (finished.kind == Kind.CARRIER) {
             CallIdentity.resolve(context, finished.startedAt)
         } else {
@@ -208,6 +315,7 @@ class RecordingCoordinator(
 
     private suspend fun finishTest(finished: Session, outcome: CaptureOutcome) {
         testArmed = false
+        testRouteId = null
         finished.plaintext?.delete()
         val verdict = if (finished.startError.isNotEmpty()) {
             VoiceCheck.Route.NOTHING
@@ -232,6 +340,14 @@ class RecordingCoordinator(
      */
     private fun pickSource(kind: Kind): CaptureSource? {
         val voipRoute = SpeakerphoneCaptureSource.Variant.VOIP.id
+
+        // A test names the route it is measuring; without that the loudspeaker
+        // route for other apps could never be proven, and everything it recorded
+        // would stay UNVERIFIED for the life of the install.
+        testRouteId?.takeIf { kind == Kind.TEST }?.let { wanted ->
+            return CaptureRegistry.byId(wanted)?.takeIf { it.recorder(context) != null }
+        }
+
         val candidates = CaptureRegistry.usable(context).filter { source ->
             if (kind == Kind.VOIP) source.id == voipRoute else source.id != voipRoute
         }
@@ -270,6 +386,14 @@ class RecordingCoordinator(
 
         /** Why a call produced nothing when no route was armed at the time. */
         const val NO_ROUTE = "no capture route was ready"
+
+        /**
+         * Below this, a communication-mode session was not a conversation —
+         * a headset connecting, an assistant turn, a notification sound.
+         */
+        const val VOIP_FLOOR_MS = 5_000L
+
+        const val TAG = "Capture"
 
         // The test call asks her to stay quiet from the fifth to the fifteenth
         // second while the other side keeps talking. Timeline slots are a

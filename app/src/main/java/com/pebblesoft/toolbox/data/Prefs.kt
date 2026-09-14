@@ -49,7 +49,7 @@ class Prefs(private val context: Context) {
         /** Record ordinary calls through the loudspeaker — audible, works anywhere. */
         val SPEAKERPHONE_CALLS = booleanPreferencesKey("speakerphone_calls")
 
-        /** Do the same for calls inside WhatsApp, Viber and their kind. */
+        /** Do the same for calls inside any other app — the watcher names none. */
         val SPEAKERPHONE_VOIP = booleanPreferencesKey("speakerphone_voip")
     }
 

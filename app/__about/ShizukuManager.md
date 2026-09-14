@@ -21,11 +21,19 @@ watches.
   or mid-restart at any moment; a binder call that throws must degrade to
   "not ready", never crash the app that is only trying to check status.
 - **Binder-received and binder-dead listeners keep the state honest** without
-  polling: when the helper starts or dies the flow updates itself, so the UI
-  reflects reality after a reboot without the user reopening a screen.
+  polling: while the process is alive, the flow updates itself when the helper
+  starts or dies. It cannot help after a reboot, because nothing of this app is
+  running then — that case is the boot notification and the re-arm button.
+- **`isInstalled()` depends on the manifest's `<queries>` entry.** Android 11
+  hides other packages unless they are named, and the state machine is built on
+  a `getPackageInfo` call for Shizuku's package. Without that entry the call
+  throws for a Shizuku that has not yet talked to this app — precisely the state
+  after a reboot — and the app would tell her to install what she already has.
 
 ## Connections
 
-- Talks to: `capture/shizuku/RecorderService` over `IRecorderService`.
+- Talks to: `capture/shizuku/PrivilegedRecorder` over `IRecorderService`, in the
+  process Shizuku spawns as the ADB shell.
 - Read by: `ui/AppViewModel` (rearm), `capture/shizuku/ShizukuCaptureSource`
-  (status + guide), `capture/RecordingCoordinator` (the recorder handle).
+  (status + guide), `capture/RecordingCoordinator` (through the source's
+  recorder handle).

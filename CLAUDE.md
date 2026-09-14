@@ -15,8 +15,8 @@ installable: yes
 - Language / runtime: Kotlin, native Android (min SDK 29, target = current
   Play requirement)
 - GUI: Jetpack Compose
-- Key libraries: Shizuku (ADB-privileged capture), whisper.cpp via JNI
-  (on-device STT), Picovoice Porcupine (SOS wake phrase), Jetpack Security
+- Key libraries: Shizuku (ADB-privileged capture), Jetpack Security, Room,
+  DataStore. PLANNED, absent: whisper.cpp JNI (STT), Porcupine (SOS phrase)
 - Data / storage: app-private encrypted files + Room index; nothing shared
 
 **Why native Kotlin** (Step-3 justification, START.md): the product IS the
@@ -72,10 +72,9 @@ Owner decrees, newest first. Each is WHAT · WHO CHECKS.
   her step by step and no computer involved — Shizuku's wireless-debugging
   pairing is the approved case. A system setting she changes herself is allowed
   only as the cure for a MEASURED failure, guided by the app — Wi-Fi calling off
-  is the named case (2026-09-14). Everything after it
-  must be automatic, including after a reboot;
-  where auto-restart fails, the app offers one button, never a procedure. Still
-  forbidden: root, a firmware/CSC change, anything needing a PC. · review.
+  is the named case (2026-09-14). Everything after it is automatic, reboot
+  included; where auto-restart fails the app offers one button, never a
+  procedure. Still forbidden: root, firmware, anything needing a PC. · review.
 - **PRIVACY IS A LAW, NOT A FEATURE.** No audio, transcript or metadata leaves
   the device except through a channel the user explicitly enabled. No analytics,
   no telemetry, no crash reporting carrying content. · review.
@@ -95,9 +94,10 @@ Owner decrees, newest first. Each is WHAT · WHO CHECKS.
 ## Docs
 
 - [README](README.md) — what it is, the name story, the navigation chain root
-- [docs/PLAN.md](docs/PLAN.md) — milestones, scenario matrix, Play-policy risk register
+- [docs/PLAN.md](docs/PLAN.md) — milestones, scenario matrix, risk register
 - [docs/FEATURES.md](docs/FEATURES.md) — the user-facing feature catalogue
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — module map, data flow, tech decisions
+- [docs/STATUS.md](docs/STATUS.md) — where the work stands, what is unproven
 
 ## Open items
 
@@ -108,6 +108,5 @@ Owner decrees, newest first. Each is WHAT · WHO CHECKS.
   executed; the tool refuses to run from inside the folder.
 - **applicationId** is `com.pebblesoft.toolbox` (neutral, as RENAME.md requires).
   It can still change until the first store upload; after that it is forever.
-- **The probe** (`app/src/main/java/com/uvuruna/callprobe/`) is out of the
-  manifest and out of the product's path. It stays on disk until the owner says
-  it may be deleted.
+- **The probe** (`com/uvuruna/callprobe/`) is out of the manifest AND out of the
+  build. It stays on disk until the owner says it may be deleted.

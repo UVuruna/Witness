@@ -45,6 +45,15 @@ android {
     }
 }
 
+// The M0 feasibility probe stays on disk until the owner says it may be
+// deleted, but it must not SHIP. Out of the manifest is not out of the APK:
+// without this, 1,400 lines of throwaway code compile into the dex of an app
+// whose laws are privacy and THE INSPECTION TEST. The probe is pure Kotlin, so
+// excluding it from the Kotlin compile tasks keeps it out of the build entirely.
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    exclude("com/uvuruna/**")
+}
+
 dependencies {
     implementation("androidx.core:core-ktx:1.15.0")
     implementation("androidx.activity:activity-compose:1.9.3")

@@ -43,7 +43,7 @@ Two project laws shape almost every file here:
 | `capture/CaptureSource.kt` | The boundary every recording mechanism plugs into. | [Standard](__about/CaptureSource.md) |
 | `capture/RecordingCoordinator.kt` | Decide → record → judge → seal → file; one call in, one row out. | [Standard](__about/RecordingCoordinator.md) |
 | `capture/CallWatcher.kt` | The eyes: a carrier call starts and ends. | [Standard](__about/CallWatcher.md) |
-| `capture/VoipWatcher.kt` | The other eyes: a call inside WhatsApp, Viber or Messenger. | [Standard](__about/VoipWatcher.md) |
+| `capture/VoipWatcher.kt` | The other eyes: a conversation inside any other app, seen in the audio mode. | [Standard](__about/VoipWatcher.md) |
 | `capture/CallIdentity.kt` | Who was on the other end, and who called whom. | [Standard](__about/CallIdentity.md) |
 | `capture/PcmRecorder.kt` | The one recording engine, stereo first, source ladder. | [Standard](__about/PcmRecorder.md) |
 | `capture/ChannelMeter.kt` | Measures the stream as it is written — per channel and over time. | [Standard](__about/ChannelMeter.md) |
@@ -54,7 +54,7 @@ Two project laws shape almost every file here:
 | `capture/CaptureOutcome.kt` | What one recording contained, and its wire form across AIDL. | Trivial |
 | `capture/WavWriter.kt` | 16-bit PCM into a WAV container, header patched on close. | Trivial |
 | `capture/CaptureService.kt` | Foreground service (`microphone`) that keeps both watchers alive. | [Standard](__about/CaptureService.md) |
-| `capture/BootReceiver.kt` | Restarts the watcher after a reboot. | Trivial |
+| `capture/BootReceiver.kt` | Tries to restart the ear after a reboot, and puts a notice in front of her when Android forbids it. | Trivial |
 | `capture/shizuku/IRecorderService.aidl` | The AIDL contract to the privileged process. | Trivial |
 | `capture/shizuku/PrivilegedRecorder.kt` | The shell-side host of the engine — the one process that hears the call. | [Standard](__about/PrivilegedRecorder.md) |
 | `capture/shizuku/ShizukuManager.kt` | The one gatekeeper to the borrowed privilege. | [Standard](__about/ShizukuManager.md) |
@@ -85,8 +85,8 @@ User-facing copy lives in `res/values/strings.xml` (English) and
 2. `SpeakerphoneCaptureSource` (CARRIER) — speaker on, microphone recording the
    room. Audible, and it works on every handset ever made, so it is what a phone
    falls back to when the quiet route is measured half or refuses to open.
-3. `SpeakerphoneCaptureSource` (VOIP) — the same mechanism for calls inside
-   WhatsApp, Viber and Messenger, where there is no modem audio to tap at all.
+3. `SpeakerphoneCaptureSource` (VOIP) — the same mechanism for calls inside any
+   other app, where there is no modem audio to tap at all.
 
 The chain is `CallWatcher` / `VoipWatcher` (notice the conversation) →
 `RecordingCoordinator` (choose a route, apply the lists) → `PcmRecorder` in one
@@ -100,8 +100,9 @@ while the other side keeps talking, and sound arriving during her silence can
 only be the far party. The verdict is stored per route in `RouteMemory`, and
 until it exists the home screen does not say the phone is covered.
 
-Still unproven until someone runs it on a real handset: that the app re-arms
-itself cleanly after a reboot.
+**Nothing in this chain has been measured on a real handset yet** — not the
+privileged route, not the loudspeaker route, not the VoIP detection, and not the
+re-arm after a reboot. [STATUS](../docs/STATUS.md) is the running record.
 
 ---
 
@@ -109,7 +110,9 @@ itself cleanly after a reboot.
 
 The feasibility harness from [PLAN](../docs/PLAN.md). It measured what each audio
 source delivers during a call, and what an hours-long microphone service costs in
-battery. It is no longer in the manifest and ships to nobody.
+battery. It is out of the manifest AND out of the build: `app/build.gradle.kts`
+excludes `com/uvuruna/**` from the Kotlin compile tasks, so none of it reaches
+the APK. It stays on disk only until the owner says it may be deleted.
 
 **What it measured** on one Samsung device (2026-09-02): the ADB shell identity
 opens the privileged sources, the microphone pipe writes real audio, and the

@@ -3,10 +3,7 @@ package com.pebblesoft.toolbox.capture
 import android.content.Context
 import android.media.AudioManager
 import android.os.Build
-import android.telephony.TelephonyManager
 import androidx.core.content.ContextCompat
-import com.pebblesoft.toolbox.permissions.AppPermission
-import com.pebblesoft.toolbox.permissions.RuntimePermissions
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -16,20 +13,28 @@ import kotlinx.coroutines.launch
 /**
  * Notices a conversation happening inside another app.
  *
- * WhatsApp, Viber, Messenger and Signal are invisible to call-state listening —
- * Android's own reference says the call-state stream considers telephony calls
- * only — so the app that watches only telephony believes nothing is happening
- * while the user is being threatened. That silence was the most dangerous thing
- * in the previous build: not a missing feature, a false sense of cover.
+ * Calls made inside other apps are invisible to call-state listening — Android's
+ * own reference says the call-state stream considers telephony calls only — so
+ * an app that watches only telephony believes nothing is happening while its
+ * user is being threatened. That silence was the most dangerous thing in the
+ * previous build: not a missing feature, a false sense of cover.
  *
- * What every one of those apps DOES do is put the phone's audio system into
- * communication mode. That is observable, costs no permission at all, and is the
- * same signal on every handset. It does not say which app, and deliberately so:
- * naming the app needs notification access, a switch that stands out to anyone
- * inspecting the phone, and THE INSPECTION TEST is worth more than an app name.
+ * **This watcher knows nothing about apps, and that is the design.** It holds no
+ * package list to keep up to date; the whole test is that the phone's audio
+ * system is in communication mode while telephony is idle. WhatsApp, Viber,
+ * Messenger, Signal, Telegram, Teams, Meet and anything written next all set
+ * that mode, so all of them are covered by the same line — and none of them is
+ * named. Naming the app would need notification access, a switch that stands out
+ * to anyone inspecting the phone, and THE INSPECTION TEST is worth more.
  *
- * Cellular calls also move the audio mode, so the telephony state is consulted
- * before reacting — otherwise an ordinary call would be filed twice.
+ * The cost of being generic is that the signal is broader than "a call": a
+ * headset connecting or an assistant turn also raises the mode. The coordinator
+ * refuses to file anything under [RecordingCoordinator.VOIP_FLOOR_MS], which is
+ * what keeps her list free of conversations that never happened.
+ *
+ * **Not measured.** That every one of those apps really raises this mode on a
+ * real handset is a platform expectation, not something this project has
+ * observed. Until it is, the feature is written down as unproven.
  */
 class VoipWatcher(
     private val context: Context,
@@ -37,17 +42,22 @@ class VoipWatcher(
     private val scope: CoroutineScope,
 ) {
     private val audio = context.getSystemService(Context.AUDIO_SERVICE) as AudioManager
-    private val telephony = context.getSystemService(Context.TELEPHONY_SERVICE) as TelephonyManager
 
     private var listener: AudioManager.OnModeChangedListener? = null
     private var poller: Job? = null
     private var inVoipCall = false
 
-    fun start() {
+    /** @return "" when the watcher is listening, otherwise why it is not. */
+    fun start(): String = try {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             val modeListener = AudioManager.OnModeChangedListener { mode -> onMode(mode) }
             listener = modeListener
             audio.addOnModeChangedListener(ContextCompat.getMainExecutor(context), modeListener)
+            // The callback only ever reports a CHANGE. A conversation already in
+            // progress when the service starts — after a reboot, after a sticky
+            // restart, or the moment permissions are granted — would otherwise
+            // never be noticed at all.
+            onMode(audio.mode)
         } else {
             poller = scope.launch {
                 while (isActive) {
@@ -56,6 +66,15 @@ class VoipWatcher(
                 }
             }
         }
+        ""
+    } catch (e: SecurityException) {
+        // Thrown bare inside a service's onCreate, this is the same failure that
+        // killed the ear on every phone last round, one class over.
+        stop()
+        "the system refused the audio-mode listener: ${e.message}"
+    } catch (e: IllegalStateException) {
+        stop()
+        "the audio-mode listener could not be registered: ${e.message}"
     }
 
     fun stop() {
@@ -70,20 +89,23 @@ class VoipWatcher(
         if (voipNow == inVoipCall) return
         inVoipCall = voipNow
         scope.launch {
-            if (voipNow) coordinator.onVoipStarted() else coordinator.onCallEnded()
+            if (voipNow) coordinator.onVoipStarted() else coordinator.onVoipEnded()
         }
     }
 
     /**
-     * A cellular call belongs to [CallWatcher]. Without the permission to ask,
-     * the safer assumption is that telephony is busy — a missed row beats two
-     * rows for one conversation and a recorder started twice.
+     * A cellular call belongs to [CallWatcher], and the app's own eyes are the
+     * only trustworthy way to know.
+     *
+     * The obvious check — `TelephonyManager.getCallState()` — is served by
+     * Telecom, which on modern Android also reports the self-managed connections
+     * that WhatsApp, Signal, Telegram and Teams register so their calls appear
+     * in the system call UI. Gating on it could therefore go permanently silent
+     * for precisely the apps this watcher exists for, with nothing to show that
+     * it had. [RecordingCoordinator.carrierCallInProgress] is set by the
+     * telephony watcher itself and cannot be confused that way.
      */
-    private fun onACellularCall(): Boolean {
-        if (!RuntimePermissions.isGranted(context, AppPermission.CALL_STATE)) return true
-        @Suppress("DEPRECATION")
-        return runCatching { telephony.callState != TelephonyManager.CALL_STATE_IDLE }.getOrDefault(true)
-    }
+    private fun onACellularCall(): Boolean = coordinator.carrierCallInProgress
 
     private companion object {
         /** Below Android 12 there is no mode callback; two seconds is a quiet poll. */

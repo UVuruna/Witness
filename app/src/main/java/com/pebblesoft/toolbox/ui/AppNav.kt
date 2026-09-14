@@ -180,6 +180,7 @@ fun AppNav(versionName: String) {
                         onOpenSetup = { nav.navigate(ROUTE_SETUP) },
                         onOpenTest = { nav.navigate(ROUTE_TEST) },
                         onOpenSettings = { nav.go(Tab.SETTINGS.route) },
+                        onRearm = vm::rearm,
                         onOpenRecordings = { nav.go(Tab.RECORDINGS.route) },
                         onOpenRecord = { id -> nav.navigate("$ROUTE_RECORD/$id") },
                     )
@@ -222,6 +223,7 @@ fun AppNav(versionName: String) {
                 composable(ROUTE_TEST) {
                     TestCallScreen(
                         state = test,
+                        voipEnabled = state.speakerphoneVoip,
                         onArm = vm::armTest,
                         onDone = { vm.cancelTest(); nav.popBackStack(Tab.HOME.route, false) },
                     )

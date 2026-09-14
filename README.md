@@ -33,8 +33,9 @@ the phone is ringing.
   spoken the user may no longer have their hands free.
 
 The full catalogue lives in [FEATURES](docs/FEATURES.md); the milestones,
-scenario matrix and Play-policy risk register in [PLAN](docs/PLAN.md); the
-module map and technology decisions in [ARCHITECTURE](docs/ARCHITECTURE.md).
+scenario matrix and risk register in [PLAN](docs/PLAN.md); the module map and
+technology decisions in [ARCHITECTURE](docs/ARCHITECTURE.md); where the work
+actually stands, right now, in [STATUS](docs/STATUS.md).
 
 ## Status
 
@@ -44,13 +45,15 @@ could not run it while live inside the folder).
 
 The product exists and builds. The capture chain records, measures what it
 recorded, and labels it honestly; the number lists, the encrypted vault and its
-seal, and the whole interface in English and Serbian are in place. **Not yet
-built:** the PIN and fingerprint gate, the disguised name and icon, the single
-recording screen (player, share, delete, seal check) and the speaker-labeled
-transcript.
+seal, the single recording screen (player, seal check, share, delete) and the
+whole interface in English and Serbian are in place. **Not yet built:** the PIN
+and fingerprint gate, the disguised name and icon, the speaker-labeled
+transcript, the SOS and the off-phone backup.
 
-One thing is still unmeasured on a real handset: whether the app re-arms itself
-cleanly after a reboot.
+Nothing in the recording path has yet been measured on a real handset — that is
+one guided test call away, and until it happens the app says so rather than
+claiming to protect anyone. [STATUS](docs/STATUS.md) is the running record of
+what is done, what is left and what is still unproven.
 
 Distribution is a signed APK from GitHub Releases — the capture mechanism cannot
 pass Play review, and the owner chose the mechanism (see [CLAUDE.md](CLAUDE.md)).

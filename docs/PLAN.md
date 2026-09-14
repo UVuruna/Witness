@@ -24,8 +24,9 @@ Newest first; each supersedes what it contradicts.
    difference between a recording and silence.
 4. **Distribution is GitHub, not Play** (owner, 2026-09-11). The capture
    mechanism cannot pass Play review and the owner chose the mechanism. The app
-   ships as a signed APK from GitHub Releases and checks there for updates. This
-   replaces the 2026-09-01 decision to build strictly inside Play policy.
+   is to ship as a signed APK from GitHub Releases and check there for updates —
+   neither is built yet (M5). This replaces the 2026-09-01 decision to build
+   strictly inside Play policy.
 5. **Capture is Shizuku** (owner, 2026-09-11), with one guided pairing the user
    performs on her own phone — no computer, no root. This replaces the
    2026-09-01 decision to use the microphone only; the loudspeaker route
@@ -65,7 +66,7 @@ THE INSPECTION TEST at a layer no app code reaches.
 |---|-----------|----------|---------------|-------|
 | M0 | **Feasibility probe** (throwaway) | What each audio source yields on a real device. | `call-recording` | done, superseded |
 | M1 | **Record + protect** | Call-triggered recording service, encrypted vault, hash+timestamp seal. | `call-recording` `vault` | vault + seal done |
-| M2 | **Measured capture** | Permissions actually requested, the service that survives Android 14, stereo-first recording with a source ladder, per-channel measurement, the guided test call, honest quality labels, number and direction on Android 12+, the loudspeaker route, VoIP detection. | `call-recording` `voip` `record-lists` | **done 2026-09-14** |
+| M2 | **Measured capture** | Permissions actually requested, the service that survives Android 14, stereo-first recording with a source ladder, per-channel measurement, the guided test call, honest quality labels, number and direction on Android 12+, the loudspeaker route, VoIP detection. | `call-recording` `voip` `record-lists` | written 2026-09-14, **nothing in it measured on a handset yet** |
 | M3 | **The door** | PIN and fingerprint gate, the disguised name and icon, the single-recording screen with player, seal check, share and delete. | `disguise` `vault` | next |
 | M4 | **Understand** | On-device whisper.cpp transcription; exact speaker labels where the device gave two channels. | `transcript` | planned |
 | M5 | **Release** | Signing config, signed APK, GitHub Release, in-app update check. | — | blocked on the owner |
@@ -82,7 +83,7 @@ THE INSPECTION TEST at a layer no app code reaches.
 | 4 | The phone splits the call into two channels | Both are recorded, compared, and the row reads "both voices" on evidence |
 | 5 | The phone yields one voice only | The row says so, the home screen says so, and the loudspeaker route is offered |
 | 6 | Nothing is permitted yet | The app asks, in one numbered list, and never pretends to be armed |
-| 7 | Call inside WhatsApp / Viber / Messenger | Recorded when the loudspeaker route is on; otherwise a visible "not saved" row |
+| 7 | Call inside another app (any of them — the detection names none) | Recorded when the loudspeaker route is on; otherwise a visible "not saved" row. **Unmeasured** for every app |
 | 8 | Abuser takes the phone and inspects it | Neutral icon, PIN, nothing in gallery/files/recents *(M3)* |
 | 9 | Recording offered as evidence | Hash + timestamp prove the file was never altered |
 | 10 | Battery dies / reboot mid-call | Partial recording up to that point is sealed and kept |
@@ -96,8 +97,8 @@ THE INSPECTION TEST at a layer no app code reaches.
 | The quiet route yields one voice | Decided by the OEM audio HAL; unknowable from code | Measure it with the guided test call, per phone, and label every recording from what was measured | The loudspeaker route, which captures both people anywhere |
 | Wi-Fi calling records as silence | Common, and the app cannot change the setting itself | Offer the exact settings screen after a failed test — the one system setting the owner allowed asking for | The loudspeaker route |
 | Shizuku does not survive a reboot | Android's limit, not ours | The boot receiver restarts the ear; the home screen offers one button to re-arm | **Unproven — scenario 11** |
-| Calls in other apps | No modem audio to tap; the call-state signal never fires | Detect through the audio mode and record on the loudspeaker | An honest "not saved" row |
-| Distribution outside Play | No store review, no automatic updates | Signed APK from GitHub Releases, in-app update check | — |
+| Calls in other apps | No modem audio to tap; the call-state signal never fires | Detect through the audio mode — generic, no app list — and record on the loudspeaker | An honest "not saved" row. **Unproven — scenario 7** |
+| Distribution outside Play | No store review, no automatic updates | Signed APK from GitHub Releases | **Neither exists yet**: no signing config, and no in-app update check (the app declares no INTERNET permission at all) |
 | A user believes she is covered when she is not | The most dangerous failure this product has | Status is `READY` only after a measurement; every other state names itself and gives one action | — |
 
 ## Open

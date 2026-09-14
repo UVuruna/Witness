@@ -34,6 +34,15 @@ class MicRecorder(private val context: Context) : RouteRecorder {
     private var previousSpeakerphone: Boolean? = null
     private var routingChanged = false
 
+    /**
+     * The descriptor is held for the life of the recording. This host runs in
+     * the app's own process, where the coordinator also keeps a reference — but
+     * a recorder that depends on its CALLER keeping its file open is a recorder
+     * waiting to be broken by a refactor.
+     */
+    @Suppress("unused")
+    private var held: ParcelFileDescriptor? = null
+
     override fun isRecording(): Boolean = engine.isRecording()
 
     /**
@@ -42,15 +51,29 @@ class MicRecorder(private val context: Context) : RouteRecorder {
      * @return "" when recording started, otherwise why it did not.
      */
     override fun start(sink: ParcelFileDescriptor): String {
+        held = sink
         routeToSpeaker()
-        val error = engine.start(LADDER, FileOutputStream(sink.fileDescriptor))
-        if (error.isNotEmpty()) restoreRoute()
+        val error = engine.start(
+            ladder = LADDER,
+            sink = FileOutputStream(sink.fileDescriptor),
+            // A microphone's second channel is a second point in the same room,
+            // never a second person — recording it would let the both-voices
+            // test fire on one person talking loudly. This route proves itself
+            // through the test call's silent window instead.
+            stereoFirst = false,
+            callAudio = false,
+        )
+        if (error.isNotEmpty()) {
+            restoreRoute()
+            held = null
+        }
         return error
     }
 
     override fun stop(): CaptureOutcome {
         val outcome = engine.stop()
         restoreRoute()
+        held = null
         return outcome
     }
 

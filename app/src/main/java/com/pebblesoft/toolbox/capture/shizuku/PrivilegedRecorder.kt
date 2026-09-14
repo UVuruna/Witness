@@ -34,6 +34,18 @@ class PrivilegedRecorder : IRecorderService.Stub() {
 
     private val engine = PcmRecorder()
 
+    /**
+     * The descriptor the APP opened, held for as long as the recording runs.
+     *
+     * `ParcelFileDescriptor` closes the file descriptor it owns when it is
+     * finalized. Taking only `sink.fileDescriptor` and letting the parcel go out
+     * of scope means the first garbage collection in this process closes the fd
+     * mid-call: every write after that throws, the worker stops, and a call that
+     * looked like it was recording ends as a 44-byte header. Holding the
+     * reference here is the whole fix, and it is why this field exists.
+     */
+    @Volatile private var sink: ParcelFileDescriptor? = null
+
     override fun probe(): String {
         val report = StringBuilder()
         for ((name, source) in PROBE_SOURCES) {
@@ -60,15 +72,41 @@ class PrivilegedRecorder : IRecorderService.Stub() {
         return report.toString()
     }
 
-    override fun start(sink: ParcelFileDescriptor): String =
-        engine.start(LADDER, FileOutputStream(sink.fileDescriptor))
+    override fun start(sink: ParcelFileDescriptor): String {
+        this.sink = sink
+        val error = engine.start(
+            ladder = LADDER,
+            sink = FileOutputStream(sink.fileDescriptor),
+            stereoFirst = true,
+            callAudio = true,
+        )
+        if (error.isNotEmpty()) releaseSink()
+        return error
+    }
 
-    override fun stop(): String = engine.stop().encode()
+    override fun stop(): String {
+        val outcome = engine.stop()
+        releaseSink()
+        return outcome.encode()
+    }
 
     override fun isRecording(): Boolean = engine.isRecording()
 
     override fun destroy() {
         if (engine.isRecording()) engine.stop()
+        releaseSink()
+    }
+
+    private fun releaseSink() {
+        val held = sink ?: return
+        sink = null
+        try {
+            held.close()
+        } catch (e: java.io.IOException) {
+            // The app owns the other end and closes it too; a already-closed
+            // descriptor here is expected and is not worth taking the shell
+            // process down for.
+        }
     }
 
     private companion object {

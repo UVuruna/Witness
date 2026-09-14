@@ -13,7 +13,7 @@ Navigation: [README](../README.md) · [PLAN](PLAN.md) · [FEATURES](FEATURES.md)
 | Module | Responsibility | Key platform pieces |
 |--------|----------------|---------------------|
 | **CallWatcher** | Notices a carrier call starting and ending. Refuses to register without the permission, and says so, rather than dying inside a service callback. | `TelephonyCallback`, `PhoneStateListener` below API 31 |
-| **VoipWatcher** | Notices a conversation inside WhatsApp, Viber, Messenger and their kind — invisible to telephony, visible in the audio mode. | `AudioManager.OnModeChangedListener` |
+| **VoipWatcher** | Notices a conversation no telephony API reports — invisible to telephony, visible in the audio mode. Holds no app list, so it covers every calling app and can name none. | `AudioManager.OnModeChangedListener` |
 | **CallIdentity** | Who was on the other end and who called whom, read back from the call log because Android 12 stopped telling listeners. | `CallLog.Calls`, `PhoneLookup` |
 | **RecordingCoordinator** | Chooses a route, applies the lists (twice — the number usually arrives late), seals, files. One conversation in, one row out. | — |
 | **PcmRecorder** | The one recording engine: stereo before mono, a ladder of sources, measured while written. Hosted by two processes. | `AudioRecord` |

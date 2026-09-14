@@ -45,6 +45,15 @@ data class CaptureOutcome(
      * sound while the user was asked to stay silent?
      */
     val timeline: List<Int> = emptyList(),
+    /**
+     * True only when the channels came from the CALL's own audio, where two
+     * channels mean uplink and downlink — two people. A microphone recording
+     * two channels is two points in one room, and two room microphones hearing
+     * one shouting person also differ, so the same test there would stamp
+     * evidence on a file holding one person. The flag exists so that test can
+     * never be applied to the wrong kind of stream.
+     */
+    val callAudio: Boolean = false,
     /** Empty when the recording ran; otherwise why it did not. */
     val error: String = "",
 ) {
@@ -61,6 +70,7 @@ data class CaptureOutcome(
             append(e.peak).append(',').append(e.rms).append(',').append(e.activeFrames)
         }
         append("|timeline=").append(timeline.joinToString(","))
+        append("|callaudio=").append(if (callAudio) "1" else "0")
         append("|error=").append(error.replace('|', '/'))
     }
 
@@ -93,6 +103,7 @@ data class CaptureOutcome(
                 differenceRms = fields["diff"]?.toIntOrNull() ?: 0,
                 timeline = fields["timeline"].orEmpty()
                     .split(',').mapNotNull(String::toIntOrNull),
+                callAudio = fields["callaudio"] == "1",
                 error = fields["error"].orEmpty(),
             )
         }

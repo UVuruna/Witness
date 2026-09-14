@@ -35,6 +35,7 @@ class PcmRecorder {
     @Volatile private var writer: WavWriter? = null
     @Volatile private var openedSource = ""
     @Volatile private var readFailure = ""
+    @Volatile private var callAudio = false
 
     fun isRecording(): Boolean = running
 
@@ -42,14 +43,27 @@ class PcmRecorder {
      * Open the best available source and start writing into [sink].
      *
      * @param ladder candidate sources, best first, as (name, MediaRecorder.AudioSource).
+     * @param stereoFirst try two channels before one. TRUE only for the call's
+     * own audio, where the two channels are the two directions of the call;
+     * FALSE for a microphone, where two channels are two points in one room and
+     * would let the both-voices test fire on one person talking loudly.
+     * @param callAudio whether this stream is the call's own audio, carried out
+     * with the measurement so the verdict can never be reached the wrong way.
      * @return "" when recording started, otherwise why every rung failed.
      */
-    fun start(ladder: List<Pair<String, Int>>, sink: FileOutputStream): String {
+    fun start(
+        ladder: List<Pair<String, Int>>,
+        sink: FileOutputStream,
+        stereoFirst: Boolean,
+        callAudio: Boolean,
+    ): String {
         if (running) return "already recording"
+        this.callAudio = callAudio
 
+        val preference = if (stereoFirst) STEREO_THEN_MONO else MONO_ONLY
         val refusals = mutableListOf<String>()
         for ((name, source) in ladder) {
-            for (channels in CHANNEL_PREFERENCE) {
+            for (channels in preference) {
                 val opened = open(source, channels)
                 if (opened == null) {
                     refusals += "$name/${channels}ch"
@@ -74,7 +88,8 @@ class PcmRecorder {
         }
         record = null
 
-        val measured = meter?.outcome(openedSource, readFailure) ?: CaptureOutcome.failed("no meter")
+        val measured = meter?.outcome(openedSource, callAudio, readFailure)
+            ?: CaptureOutcome.failed("no meter")
         meter = null
 
         try {
@@ -154,8 +169,11 @@ class PcmRecorder {
     private companion object {
         const val SAMPLE_RATE = 16_000
 
-        /** Stereo first: on the devices that split the call, mono throws half of it away. */
-        val CHANNEL_PREFERENCE = intArrayOf(2, 1)
+        /** Call audio: on the devices that split the call, mono throws half of it away. */
+        val STEREO_THEN_MONO = intArrayOf(2, 1)
+
+        /** A microphone: a second channel is a second point in one room, never a second person. */
+        val MONO_ONLY = intArrayOf(1)
 
         const val BUFFER_FACTOR = 4
         const val MIN_BUFFER_BYTES = 8192

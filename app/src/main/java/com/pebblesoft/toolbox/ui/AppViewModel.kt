@@ -210,9 +210,15 @@ class AppViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    /** Arm the guided test: the next call is measured, reported, and thrown away. */
-    fun armTest() {
-        container.coordinator.armTest()
+    /**
+     * Arm the guided test: the next call is measured, reported, and thrown away.
+     *
+     * @param routeId names the route to measure. The loudspeaker route for calls
+     * inside other apps has to be named — such a call never reaches the
+     * telephony path, so it can never be picked as "the best available route".
+     */
+    fun armTest(routeId: String?) {
+        container.coordinator.armTest(routeId)
         refresh()
     }
 

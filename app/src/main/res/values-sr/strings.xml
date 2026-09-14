@@ -128,7 +128,7 @@
     <string name="settings_speakerphone_calls">Čuvaj pozive preko zvučnika</string>
     <string name="settings_speakerphone_calls_detail">Radi na svakom telefonu, ali se poziv čuje naglas.</string>
     <string name="settings_speakerphone_voip">Čuvaj pozive iz drugih aplikacija</string>
-    <string name="settings_speakerphone_voip_detail">WhatsApp, Viber, Messenger. Takođe preko zvučnika — tihog načina nema.</string>
+    <string name="settings_speakerphone_voip_detail">WhatsApp, Viber, Messenger, Signal, Telegram — i svaka druga aplikacija koja zove. Takođe preko zvučnika: tihog načina nema.</string>
     <string name="settings_look_section">Kako aplikacija izgleda na tvom telefonu</string>
     <string name="settings_look_real">Svoje ime i ikona</string>
     <string name="settings_look_neutral">Neutralno ime i ikona</string>
@@ -171,9 +171,13 @@
     <string name="guide_speaker_keep_audible">Dok je ovo uključeno, pozivi koje čuvaš čuju se naglas. Isključi kad je neko blizu.</string>
 
     <!-- Pozivi iz drugih aplikacija -->
-    <string name="guide_voip_headline">Pozivi u WhatsApp-u, Viber-u, Messenger-u</string>
+    <string name="guide_voip_headline">Pozivi iz drugih aplikacija</string>
     <string name="guide_voip_2_title">Uključi čuvanje tih poziva</string>
-    <string name="guide_voip_2_detail">Ti pozivi mogu da se sačuvaju samo preko zvučnika. Ako je ovo isključeno, aplikacija svejedno zapiše da je poziv bio i da nije sačuvan.</string>
+    <string name="guide_voip_2_detail">WhatsApp, Viber, Messenger, Signal, Telegram i ostale rade isto ovde — aplikacija i ne gleda koja je. Ti pozivi mogu da se sačuvaju samo preko zvučnika. Ako je ovo isključeno, aplikacija svejedno zapiše da je poziv bio i da nije sačuvan.</string>
+
+    <!-- Posle restarta -->
+    <string name="boot_reopen_title">Otvori me jednom</string>
+    <string name="boot_reopen_detail">Telefon se restartovao. Dodirni ovde i pritisni dugme na prvom ekranu — traje par sekundi.</string>
 
     <!-- Servis -->
     <string name="service_problem_permissions">Nešto što aplikaciji treba još nije dozvoljeno, pa se pozivi ne čuvaju.</string>
@@ -186,6 +190,7 @@
     <string name="test_step_2">Pričaj prvih pet sekundi.</string>
     <string name="test_step_3">Onda ćuti deset sekundi i pusti drugu stranu da priča. Prekini poziv.</string>
     <string name="test_start">Počni proveru</string>
+    <string name="test_start_voip">Proveri poziv u drugoj aplikaciji</string>
     <string name="test_waiting">Čekam tvoj poziv…</string>
     <string name="test_recording">Slušam. Sad ćuti i pusti drugu stranu da priča.</string>
     <string name="test_result_both">Oboje ste u snimku. Ovaj telefon je pokriven.</string>

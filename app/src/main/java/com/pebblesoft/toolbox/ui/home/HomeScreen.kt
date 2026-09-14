@@ -56,6 +56,7 @@ fun HomeScreen(
     onOpenSetup: () -> Unit,
     onOpenTest: () -> Unit,
     onOpenSettings: () -> Unit,
+    onRearm: () -> Unit,
     onOpenRecordings: () -> Unit,
     onOpenRecord: (Long) -> Unit,
 ) {
@@ -98,6 +99,13 @@ fun HomeScreen(
                         },
                         button = stringResource(R.string.home_setup_button),
                         onClick = onOpenSetup,
+                        // The setup guide tells her, in her own language, that
+                        // after a restart she opens the app and taps a button on
+                        // this screen. Until now that button did not exist —
+                        // the sentence was a promise to a phone that had gone
+                        // quiet overnight.
+                        secondButton = stringResource(R.string.home_rearm),
+                        onSecond = onRearm,
                     )
                 }
             }
@@ -182,6 +190,8 @@ private fun ActionCard(
     detail: String,
     button: String,
     onClick: () -> Unit,
+    secondButton: String? = null,
+    onSecond: () -> Unit = {},
 ) {
     StatusCard(
         icon = Icons.Filled.ErrorOutline,
@@ -190,15 +200,26 @@ private fun ActionCard(
         accent = MaterialTheme.colorScheme.tertiaryContainer,
         onAccent = MaterialTheme.colorScheme.onTertiaryContainer,
     ) {
-        Button(
-            onClick = onClick,
-            modifier = Modifier.heightIn(min = 48.dp),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.onTertiaryContainer,
-                contentColor = MaterialTheme.colorScheme.tertiaryContainer,
-            ),
-        ) {
-            Text(button)
+        Column {
+            Button(
+                onClick = onClick,
+                modifier = Modifier.heightIn(min = 48.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.onTertiaryContainer,
+                    contentColor = MaterialTheme.colorScheme.tertiaryContainer,
+                ),
+            ) {
+                Text(button)
+            }
+            if (secondButton != null) {
+                Spacer(Modifier.height(10.dp))
+                TextButton(
+                    onClick = onSecond,
+                    modifier = Modifier.heightIn(min = 48.dp),
+                ) {
+                    Text(secondButton, color = MaterialTheme.colorScheme.onTertiaryContainer)
+                }
+            }
         }
     }
 }

@@ -14,10 +14,21 @@ recorder that performs it.
   puts both people in the file without asking the phone for anything unusual, so
   it satisfies the half-recording law in full. It is the only mechanism in the
   app that no manufacturer can close.
-- **Two entries, one class.** Carrier calls and calls inside WhatsApp, Viber or
-  Messenger are the same mechanism behind two different switches, so they are two
-  entries of this class rather than two classes (ONE KIND, ONE CLASS). `Variant`
-  is the whole difference.
+- **Two entries, one class.** Carrier calls and calls inside other apps are the
+  same mechanism behind two different switches, so they are two entries of this
+  class rather than two classes (ONE KIND, ONE CLASS). `Variant` is the whole
+  difference — plus one asymmetry worth naming: the VOIP entry can only be
+  measured by a test that NAMES it, because such a call never reaches the
+  telephony path and so is never chosen as "the best available route". Without
+  that, everything it recorded would stay `UNVERIFIED` for the life of the
+  install however well it worked.
+- **It records mono, on purpose.** `PcmRecorder` asks for stereo first for the
+  call's own audio, where two channels are the two directions. Two microphone
+  channels are two points in one room: they differ, and both are active, while
+  one person talks — which would let the both-voices test pass on a file holding
+  one person. This route proves itself through the test call's silent window
+  instead, and the stream is flagged as not being call audio so the wrong proof
+  cannot be reached at all.
 - **Off until she turns it on.** The cost — everyone nearby hears the call — is
   real and is hers to weigh, so `status()` reports `UNAVAILABLE` until the switch
   is on, and the guide states the cost before the switch appears.

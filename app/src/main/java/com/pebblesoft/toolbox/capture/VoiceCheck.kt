@@ -86,8 +86,15 @@ object VoiceCheck {
     /**
      * Two channels hold two people when BOTH carried speech for a real share of
      * the call AND the channels are genuinely different from one another.
+     *
+     * The proof is only valid for the CALL's own audio, where the two channels
+     * are uplink and downlink. Two microphone channels are two points in one
+     * room: they also differ, and they are also both active, while one person
+     * shouts. Applying this test there would stamp evidence on a one-person
+     * file — so the stream has to say what it is before the test may run.
      */
     private fun channelsHoldTwoPeople(outcome: CaptureOutcome): Boolean {
+        if (!outcome.callAudio) return false
         val both = outcome.energy.take(2)
         if (both.size < 2) return false
         val everyChannelSpoke = both.all { it.activeShare(outcome.frames) >= MIN_ACTIVE_SHARE }

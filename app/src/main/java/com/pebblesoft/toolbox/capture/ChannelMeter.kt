@@ -69,8 +69,9 @@ class ChannelMeter(
         }
     }
 
-    fun outcome(source: String, error: String = ""): CaptureOutcome = CaptureOutcome(
+    fun outcome(source: String, callAudio: Boolean, error: String = ""): CaptureOutcome = CaptureOutcome(
         source = source,
+        callAudio = callAudio,
         channels = channels,
         frames = frames,
         energy = (0 until channels).map { channel ->

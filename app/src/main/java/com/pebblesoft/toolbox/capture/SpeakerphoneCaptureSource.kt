@@ -47,7 +47,7 @@ class SpeakerphoneCaptureSource(
             switchDetailRes = R.string.guide_speaker_2_detail,
         ),
 
-        /** WhatsApp, Viber, Messenger and their kind — the only route that reaches them. */
+        /** Calls inside any other app — the only route that can reach those at all. */
         VOIP(
             id = "speakerphone-voip",
             labelRes = R.string.route_speakerphone_voip_label,
