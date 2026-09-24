@@ -22,8 +22,11 @@ There are two ways to get both people into that file, and the app uses whichever
 this particular phone can actually deliver. **Quietly:** the call's own audio,
 opened through a privilege Shizuku lends the app after one guided pairing — no
 root, no computer, and nobody in the room notices. **Out loud:** the call on the
-loudspeaker with the microphone recording the room, which works on every handset
-ever made and costs the user the privacy of the room.
+loudspeaker with the microphone recording the room — the route this catalogue
+used to call the one that works on every handset. Measured on 2026-09-24
+(Android 16): Android silences an app's microphone for the whole of a call, so
+this route records nothing, and today the quiet route is the only one left for
+ordinary calls ([STATUS](STATUS.md)).
 
 Which one works here is not promised, it is **measured**. Once, during setup, the
 app asks for twenty seconds of a real call: talk for five seconds, then stay
@@ -39,9 +42,11 @@ Calls through WhatsApp, Viber, Messenger and their kind are invisible to
 Android's call-state signal, and their audio never passes through anything the
 privileged route can reach. The app notices them anyway — every one of those apps
 puts the phone into communication mode, which costs no permission to observe.
-With loudspeaker recording switched on, such a call is saved like any other. With
-it off, the call still becomes a line saying it happened and was not saved: a gap
-the user can see beats a gap she cannot.
+With loudspeaker recording switched on, such a call was meant to be saved like
+any other — but the same Android policy silences a recording app's microphone
+while the calling app holds it (research 2026-09-24, not yet measured with a real
+calling app). With it off, the call still becomes a line saying it happened and
+was not saved: a gap the user can see beats a gap she cannot.
 
 ### Record and skip lists · `record-lists`
 

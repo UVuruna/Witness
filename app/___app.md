@@ -83,8 +83,9 @@ User-facing copy lives in `res/values/strings.xml` (English) and
    Whether it carries both people is decided by the manufacturer's audio driver,
    so it is measured rather than promised.
 2. `SpeakerphoneCaptureSource` (CARRIER) — speaker on, microphone recording the
-   room. Audible, and it works on every handset ever made, so it is what a phone
-   falls back to when the quiet route is measured half or refuses to open.
+   room. Designed as the fallback that works on every handset; **measured
+   2026-09-24 on Android 16: the audio policy silences the app's microphone for
+   the whole call**, so it records digital silence ([STATUS](../docs/STATUS.md)).
 3. `SpeakerphoneCaptureSource` (VOIP) — the same mechanism for calls inside any
    other app, where there is no modem audio to tap at all.
 

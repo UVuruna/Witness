@@ -9,10 +9,13 @@ put the audio routing back the way it was found.
 
 ## Decisions that outlive the code
 
-- **This is the route that always works.** The privileged route depends on a
-  manufacturer's audio driver cooperating; this one depends on physics. The far
-  party's voice leaves the loudspeaker into the room and the microphone hears the
-  room, so both people land in the file on any handset ever made.
+- **This was meant to be the route that always works.** The room is physics,
+  but what an app receives during a call is policy: measured 2026-09-24 on
+  Android 16, the audio policy marks this recorder `silenced` for the whole of a
+  carrier call, even with the app in the foreground, and the file holds digital
+  silence (labelled Unusable, as it should be). AOSP's
+  `AudioPolicyService::updateUidStates_l` does the same to any capture that
+  cannot bypass the concurrent-capture policy.
 - **Echo cancellation is the enemy here.** `VOICE_COMMUNICATION` exists to
   remove exactly what this route came for — the far party's voice coming back out
   of the speaker. So the ladder starts at `UNPROCESSED`, then `MIC`, and only

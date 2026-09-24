@@ -18,7 +18,7 @@ Navigation: [README](../README.md) · [PLAN](PLAN.md) · [FEATURES](FEATURES.md)
 | **RecordingCoordinator** | Chooses a route, applies the lists (twice — the number usually arrives late), seals, files. One conversation in, one row out. | — |
 | **PcmRecorder** | The one recording engine: stereo before mono, a ladder of sources, measured while written. Hosted by two processes. | `AudioRecord` |
 | **PrivilegedRecorder** | That engine inside the process Shizuku spawns as the ADB shell — the only one that may open the call's own audio. | Shizuku `UserService`, AIDL, `VOICE_CALL` |
-| **MicRecorder** | That engine inside the app, with the loudspeaker on: the route that works on every handset. | `setCommunicationDevice`, `UNPROCESSED`/`MIC` |
+| **MicRecorder** | That engine inside the app, with the loudspeaker on. Measured 2026-09-24: silenced by Android for the whole of a call, so it records nothing ([STATUS](STATUS.md)). | `setCommunicationDevice`, `UNPROCESSED`/`MIC` |
 | **ChannelMeter / VoiceCheck** | Measure the stream per channel and over time, then decide whether two PEOPLE are in the file. The only writer of `Quality`. | — |
 | **RouteMemory** | What the guided test call proved about each route ON THIS PHONE, and which routes the user switched on. | DataStore |
 | **Vault** | Encrypted storage of recordings + transcripts, hash + timestamp seal at creation, Room index. | Jetpack Security, Room |

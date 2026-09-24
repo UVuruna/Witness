@@ -98,15 +98,15 @@ Owner decrees, newest first. Each is WHAT · WHO CHECKS.
 - [docs/FEATURES.md](docs/FEATURES.md) — the user-facing feature catalogue
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — module map, data flow, tech decisions
 - [docs/STATUS.md](docs/STATUS.md) — where the work stands, what is unproven
+- [docs/SETUP_GUIDE.md](docs/SETUP_GUIDE.md) — the guided setup, on screen + specified
 
 ## Open items
 
-- **Capture is Shizuku first, loudspeaker always** (2026-09-11 / 2026-09-14).
-  Both-voices coverage is MEASURED per phone by the guided test call. Still
-  unproven: re-arming after a reboot.
-- **Folder rename** `Safety` → `Witness` ([RENAME.md](RENAME.md)) — still not
-  executed; the tool refuses to run from inside the folder.
-- **applicationId** is `com.pebblesoft.toolbox` (neutral, as RENAME.md requires).
-  It can still change until the first store upload; after that it is forever.
-- **The probe** (`com/uvuruna/callprobe/`) is out of the manifest AND out of the
-  build. It stays on disk until the owner says it may be deleted.
+- **Capture is Shizuku first, loudspeaker always** (2026-09-11 / 2026-09-14),
+  measured per phone by the guided test call. **Measured 2026-09-24: today
+  neither route records** — see [STATUS](docs/STATUS.md).
+- **Folder rename** `Safety` → `Witness` ([RENAME.md](RENAME.md)) — not yet run.
+- **applicationId** `com.pebblesoft.toolbox` (neutral, per RENAME.md); fixed
+  forever after the first store upload.
+- **The probe** (`com/uvuruna/callprobe/`) is out of the manifest and the build;
+  it stays on disk until the owner says it may go.

@@ -1,6 +1,8 @@
 # SpeakerphoneCaptureSource
 
-The capture route that satisfies EVERY PHONE, OR IT DOES NOT COUNT.
+The capture route that was meant to satisfy EVERY PHONE, OR IT DOES NOT COUNT —
+and that records silence during calls (measured 2026-09-24 on Android 16; see
+[MicRecorder](MicRecorder.md) and [STATUS](../../docs/STATUS.md)).
 
 ## Responsibility
 

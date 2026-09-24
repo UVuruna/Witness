@@ -16,10 +16,11 @@ the phone is ringing.
 ## What it does
 
 - **Records calls** automatically (all numbers, or filtered by the user's own
-  record/skip lists) as a single audio file per call, by whichever of two routes
-  this particular phone can actually deliver both people through: quietly, from
-  the call's own audio via Shizuku, or out loud through the speaker — a choice
-  the app MEASURES with a twenty-second test call rather than promising.
+  record/skip lists) as a single audio file per call, quietly, from the call's
+  own audio via Shizuku — whether both people reach the file on a given phone is
+  MEASURED with a twenty-second test call rather than promised. (The loudspeaker
+  route beside it records silence: Android mutes an app's microphone during a
+  call — measured 2026-09-24, see [STATUS](docs/STATUS.md).)
 - **Transcribes on the device** — no internet needed — and labels the timeline
   by speaker: `[mm:ss] WHO: what was said`.
 - **Guards the evidence**: encrypted storage, hash + timestamp per recording so
@@ -50,10 +51,14 @@ whole interface in English and Serbian are in place. **Not yet built:** the PIN
 and fingerprint gate, the disguised name and icon, the speaker-labeled
 transcript, the SOS and the off-phone backup.
 
-Nothing in the recording path has yet been measured on a real handset — that is
-one guided test call away, and until it happens the app says so rather than
-claiming to protect anyone. [STATUS](docs/STATUS.md) is the running record of
-what is done, what is left and what is still unproven.
+Measured on an Android 16 emulator on 2026-09-24, **the app does not record a
+call yet**: the quiet route is refused by the audio server (an identity bug with
+a proven fix), the loudspeaker route is silenced by Android for the whole call
+(policy, not a bug), and the call log is never read, so no call gets a
+direction. What a real handset still has to answer is listed in
+[STATUS](docs/STATUS.md), the running record of what is done, what is left and
+what is still unproven. How a user will be guided through setup is specified in
+[SETUP GUIDE](docs/SETUP_GUIDE.md).
 
 Distribution is a signed APK from GitHub Releases — the capture mechanism cannot
 pass Play review, and the owner chose the mechanism (see [CLAUDE.md](CLAUDE.md)).

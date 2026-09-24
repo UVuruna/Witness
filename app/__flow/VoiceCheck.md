@@ -54,8 +54,8 @@ silence is slots 20 to 60.
 
 `NOTHING` and `ONE_PERSON_ONLY` are not dead ends: the test screen then offers
 the Wi-Fi calling switch, which is the single most common reason a call records
-as silence, and points at the loudspeaker route, which captures both people on
-any handset.
+as silence, and points at the loudspeaker route — which, measured on 2026-09-24,
+Android silences for the whole call ([STATUS](../../docs/STATUS.md)).
 
 ## Why the thresholds are where they are
 
